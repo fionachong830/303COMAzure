@@ -1,0 +1,54 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Edit Inventory{% endblock %}
+{% block header %}Edit Inventory{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for data in inventory%}
+<h5>
+    <form action="/staff/{{info.UserID}}/inventory/{{data.InventoryID}}/edit" method="post" enctype="multipart/form-data">
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>INVENTORY DETAILS<br></h2>
+                    <label for="InventoryID">Inventory ID</label>
+                    {{data.InventoryID}}<br>
+                    <label for="InventoryName">Inventory Name</label>
+                    <input type="text" name="InventoryName" required value="{{data.InventoryName}}" /> <br>
+                    <label for="Description">Description</label>
+                    <input type="text" name="Description" required value="{{data.Description}}"/> <br>
+                    <label for="Stock">Stock</label>
+                    {{data.Stock}}<br>
+                    <label for="Attachment">Upload Document</label>
+                    {{data.Attachment}} 
+                    <div class="buttons">
+                        <label for="{{data.InventoryName}}" >Edit Attachment</label>
+                    </div>
+            </p>
+        </div>
+        <input type="submit" value="Submit" /> <br>
+        <input type="button" value="Back" onclick="history.back()">     
+    </div>
+    </form>
+    <input class="modal-state_cus" id="{{data.InventoryName}}" type="checkbox" />
+    <div class="modal_cus">
+        <label class="modal__bg_cus" for="{{data.InventoryName}}"></label>
+        <div class="modal__inner_cus">
+            <label class="modal__close_cus" for="{{data.InventoryName}}"></label>
+            <h2>Edit Attachment</h2>
+            <div class="background-box-yellow">
+                <div class="fill-in">
+                    {% for info in user %}
+                    <form action="/staff/{{info.UserID}}/inventory/{{data.InventoryID}}/edit/submitpic" method="post" enctype="multipart/form-data">
+                    {% endfor %}
+                        <label for="Attachment">Upload Document</label>
+                        <input type="file" name="Attachment"  required> <br>
+                        <input type="submit" value="Upload" />
+                    </form>
+                </div>    
+            </div>
+        </div>
+    </div>
+</h5>
+{% endfor %}
+{% endfor %}
+{% endblock %}

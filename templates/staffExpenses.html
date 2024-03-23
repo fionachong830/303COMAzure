@@ -1,0 +1,50 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Expenses {% endblock %}
+{% block header %}Expenses {% endblock %} 
+{% block content %}
+{% for info in user%}
+<div class="buttons">
+    <button type="button" onclick="window.location.href='/staff/{{info.UserID}}/addExpenses'">+ Expenses</button>
+</div> 
+<div class="background-box-yellow">
+    <p>
+        <input type="text" id="myInput" onkeyup="filtering(1)" placeholder="Search for Project ID.." title="Type in a Project ID">
+        <table id="myTable" class="table-sort table-arrows">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Project ID</th>
+                    <th>Details</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Attachment</th>
+                    <th>Claimed By</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            {% for data in expenses%}
+            <tr>
+                <td>{{data.IEID}}</td>
+                <td>{{data.ProjectID}}</td>
+                <td>{{data.Details}}</td>
+                <td>{{data.Date}}</td>
+                <td>{{data.Category}}</td>
+                <td>{{data.Amount}}</td>
+                <td>{{data.Attachment}} 
+                    <a href="https://fionafypstorageaccount.blob.core.windows.net/incomeexpenses/{{data.Attachment}}" target="_blank"><i class='bx bxs-download' ></i></a><br>
+                    <!--
+                    <a href="/staff/{{info.UserID}}/IncomeExpenses/{{data.IEID}}/download" target="_blank"><i class='bx bxs-download' ></i></a>
+                    -->
+                </td>
+                <td>{{data.ClaimedBy}}</td>
+                <td>
+                    <span><a href="/staff/{{info.UserID}}/IncomeExpenses/{{data.IEID}}/edit"><i class='bx bxs-edit-alt' ></i></a></span>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </p>
+</div>
+{% endfor %}
+{% endblock %}

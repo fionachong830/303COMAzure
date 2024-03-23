@@ -1,0 +1,61 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}View Customer{% endblock %}
+{% block header %}View Customer{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for data in customer%}
+<h5>
+    <form>
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>BASIC DETAILS<br></h2>
+                    <label for="CustomerID">Customer ID</label>
+                    {{data.CustomerID}} <br>
+                    <label for="CompanyName">Company Name</label>
+                    {{data.CompanyName}} <br>
+                    <label for="Password">Password</label>
+                    {{data.Password}} <br>
+                    <label for="CompanyType">Company Type</label>
+                    {{data.CompanyType}} <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>PRIMARY CONTACT<br></h2>
+                    <label for="ContactPerson">Name</label>
+                    {{data.ContactPerson}} <br>
+                    <label for="PhoneNo">Phone Number</label>
+                    {{data.PhoneNo}} <br>
+                    <label for="Email">Email</label>
+                    {{data.Email}} <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>SECOND CONTACT<br></h2>
+                    <label for="SecondContact">Name</label>
+                    {{data.SecondContact}} <br>
+                    <label for="SecondContactPhone">Phone Number</label>
+                    {{data.SecondContactPhone}} <br>
+                    <label for="SecondContactEmail">Email</label>
+                    {{data.SecondContactEmail}} <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>ADDRESS <br></h2>
+                    <label for="BillingAddress">Billing Address</label>
+                    {{data.BillingAddress}} <br>
+                    <label for="PrimaryAddress">Primary Address</label>
+                    {{data.PrimaryAddress}} <br>
+            </p>
+        </div>
+        <br> 
+        <input type="button" value="Back" onclick="history.back()">         
+    </div>
+    </form>
+</h5>
+{% endfor %}
+{% endfor %}
+{% endblock %}

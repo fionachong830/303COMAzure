@@ -1,0 +1,63 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}View Activity{% endblock %}
+{% block header %}View Activity{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for data in activity%}
+<h5>
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>PROJECT DETAILS <br></h2>
+                <label for="ProjectID"> Project</label>
+                {{data.ProjectID}} - {{data.ProjectName}} - {{data.ProjectStatus}} 
+                <span>{% if role=='Admin'%}<a href="/staff/{{info.UserID}}/project/{{data.ProjectID}}/view">{% endif %}{% if role=='Normal'%}<a href="/staff/{{info.UserID}}/project/{{data.ProjectID}}/view">{% endif %}{% if role=='Customer'%} <a href="/customer/{{info.CustomerID}}/project/{{data.ProjectID}}/view">{% endif %} 
+                
+                <i class='bx bxs-notepad' ></i></a></span>
+                <input type="hidden" name="ProjectID" value={{data.ProjectID}} />
+            </p>
+        </div> 
+        <div class="background-box-yellow">
+            <p>
+                <h2>ACTIVITY DETAILS <br></h2>
+                    <label for="ActivityName">Activity Name</label>
+                    {{data.ActivityName}}<br>
+                    <label for="ActivityStatus">Activity Status</label>
+                    {{data.ActivityStatus}} <br>
+                    <label for="DeletedBy">Deleted By</label>
+                    {{data.DeletedBy}} <br>
+                    <label for="ActivityDescription">Description</label>
+                    {{data.ActivityDescription}} <br>
+                    <label for="ActivityLocation">Location</label>
+                    {{data.ActivityLocation}} <br>
+                    <label for="ActivityStartDate">Start Date</label>
+                    {{data.ActivityStartDate}} <br>
+                    <label for="ActivityEndDate">End Date</label>
+                    {{data.ActivityEndDate}} <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>ACTIVITY ASSIGN DETAIL<br></h2><br> 
+                <table id="myTable">
+                    <thead>
+                        <tr>
+                            <th>Staff ID</th>
+                            <th>Staff Name</th>
+                        </tr>
+                    </thead>
+                {% for line in ActivityAssign%}
+                <tr>
+                    <td>{{line.UserID}}</td>
+                    <td>{{line.Name}}</td>
+                </tr>
+                {% endfor %}
+                </table>
+            </p>
+        </div>
+    </div>
+{% endfor %}
+{% endfor %}
+<br><input type="button" value="Back" onclick="history.back()"> 
+</h5>
+{% endblock %}

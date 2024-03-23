@@ -1,0 +1,184 @@
+CREATE DATABASE FYP_FIONA;
+
+CREATE TABLE tbl_UserManagement(
+UserID INT(8) ZEROFILL AUTO_INCREMENT,
+Password VARCHAR(50) NOT NULL,
+Name VARCHAR(50) NOT NULL,
+Email VARCHAR(50) NOT NULL UNIQUE,
+PhoneNo INT(8) NOT NULL UNIQUE,
+Role ENUM("Admin","Normal") NOT NULL,
+LoginStatus BOOLEAN NOT NULL,
+PRIMARY KEY(UserID)
+);
+
+CREATE TABLE tbl_Customer(
+CustomerID INT(8) ZEROFILL AUTO_INCREMENT,
+Password VARCHAR(50) NOT NULL,
+CompanyName VARCHAR(100) NOT NULL,
+ContactPerson VARCHAR(50) NOT NULL,
+PhoneNo INT(8) NOT NULL,
+Email VARCHAR(50) NOT NULL,
+SecondContact VARCHAR(50),
+SecondContactEmail VARCHAR(50),
+SecondContactPhone INT(8),
+BillingAddress VARCHAR(200) NOT NULL,
+PrimaryAddress VARCHAR(200) NOT NULL,
+CompanyType VARCHAR(50),
+LoginStatus BOOLEAN NOT NULL,
+PRIMARY KEY(CustomerID)
+);
+
+CREATE TABLE tbl_Project(
+ProjectID INT(8) ZEROFILL AUTO_INCREMENT,
+CustomerID  INT(8) ZEROFILL NOT NULL,
+ProjectName VARCHAR(50) NOT NULL,
+Description VARCHAR(200),
+Location VARCHAR(200) NOT NULL,
+StartDate DATE NOT NULL,
+EndDate DATE NOT NULL,
+WarrantyStart DATE,
+WarrantyEnd DATE,
+ProjectStatus ENUM("Pending for Quotation", "Quotation Pending for Confirmation", "Project Start", "Warranty Start", "Project End", "Closed") NOT NULL,
+TotalAmount DOUBLE(10,2), 
+Invoiced DOUBLE(10,2),
+AmountReceived DOUBLE(10,2),
+ProjectAttachment VARCHAR(100),
+ClosedBy INT(8) ZEROFILL, 
+PRIMARY KEY (ProjectID),
+FOREIGN KEY (CustomerID) REFERENCES tbl_Customer(CustomerID), 
+FOREIGN KEY (ClosedBy) REFERENCES tbl_UserManagement(UserID)
+);
+
+CREATE TABLE tbl_Quotation(
+QuotationID INT(8) ZEROFILL AUTO_INCREMENT,
+ProjectID INT(8) ZEROFILL NOT NULL,
+QuotationTitle VARCHAR(50) NOT NULL, 
+ToField VARCHAR(50) NOT NULL,
+Attn VARCHAR(50) NOT NULL, 
+GrantTotal DOUBLE(10,2) NOT NULL,
+Remarks VARCHAR(200),
+QuotationStatus ENUM("New", "Pending for Confirmation", "Confirmed", "Rejected") NOT NULL,
+QuotationDate DATE,
+ConfirmedBy INT(8) ZEROFILL,  
+ConfirmedWith VARCHAR(50),
+ConfirmedTime DATETIME,
+PRIMARY KEY (QuotationID),
+FOREIGN KEY (ProjectID) REFERENCES tbl_Project(ProjectID),
+FOREIGN KEY (ConfirmedBy) REFERENCES tbl_UserManagement(UserID)
+);
+
+CREATE TABLE tbl_QuotationLine(
+QuotationID INT(8) ZEROFILL NOT NULL,
+WorkID INT(8) ZEROFILL NOT NULL,
+WorkDescription VARCHAR(100) NOT NULL,
+UnitRate DOUBLE(10,2) NOT NULL,
+Quantity INT NOT NULL,
+Quantifier VARCHAR(10) NOT NULL,
+Amount DOUBLE(10,2) NOT NULL,
+PRIMARY KEY (QuotationID, WorkID),
+FOREIGN KEY (QuotationID) REFERENCES tbl_Quotation(QuotationID)
+);
+
+CREATE TABLE tbl_Invoice(
+InvoiceID INT(8) ZEROFILL AUTO_INCREMENT,
+ProjectID INT(8) ZEROFILL NOT NULL,
+InvoiceTitle VARCHAR(50) NOT NULL,
+BankAccountNo VARCHAR(20),
+ToField VARCHAR(50) NOT NULL,
+Attn VARCHAR(50) NOT NULL, 
+GrantTotal DOUBLE(10,2) NOT NULL,
+InvoiceDate DATE,
+DueDate DATE,
+PayDate DATE, 
+InvoiceStatus ENUM("New", "Pending for Payment", "Paid", "Rejected") NOT NULL,
+Remarks VARCHAR(200),
+ConfirmedBy INT(8) ZEROFILL,
+PRIMARY KEY (InvoiceID),
+FOREIGN KEY (ProjectID) REFERENCES tbl_Project(ProjectID),
+FOREIGN KEY (ConfirmedBy) REFERENCES tbl_UserManagement(UserID)
+);
+
+CREATE TABLE tbl_InvoiceLine(
+InvoiceID INT(8) ZEROFILL NOT NULL,
+WorkID INT(8) ZEROFILL NOT NULL,
+WorkDescription VARCHAR(100) NOT NULL,
+UnitRate DOUBLE(10,2) NOT NULL,
+Quantity INT NOT NULL,
+Quantifier VARCHAR(10) NOT NULL,
+Amount DOUBLE(10,2) NOT NULL,
+PRIMARY KEY (InvoiceID, WorkID),
+FOREIGN KEY (InvoiceID) REFERENCES tbl_Invoice(InvoiceID)
+);
+
+CREATE TABLE tbl_Activity(
+ActivityID INT(8) ZEROFILL AUTO_INCREMENT,
+ProjectID INT(8) ZEROFILL NOT NULL,
+ActivityName VARCHAR(50) NOT NULL,
+ActivityDescription VARCHAR(200),
+ActivityLocation VARCHAR(20) NOT NULL, 
+ActivityStartDate DATE NOT NULL,
+ActivityEndDate DATE NOT NULL,
+ActivityStatus ENUM("New", "In Progress", "Finished", "Deleted") NOT NULL,
+DeletedBy INT(8) ZEROFILL, 
+PRIMARY KEY (ActivityID),
+FOREIGN KEY (ProjectID) REFERENCES tbl_Project(ProjectID), 
+FOREIGN KEY (DeletedBy) REFERENCES tbl_UserManagement(UserID)
+);
+
+CREATE TABLE tbl_ActivityAssign(
+ActivityID INT(8) ZEROFILL NOT NULL,
+UserID INT(8) ZEROFILL NOT NULL,
+PRIMARY KEY (ActivityID,UserID),
+FOREIGN KEY (ActivityID) REFERENCES tbl_Activity(ActivityID), 
+FOREIGN KEY (UserID) REFERENCES tbl_UserManagement(UserID)
+);
+
+CREATE TABLE tbl_Inventory(
+InventoryID INT(8) ZEROFILL AUTO_INCREMENT,
+InventoryName VARCHAR(50) NOT NULL,
+Description VARCHAR(200),
+Stock INT NOT NULL,
+Attachment VARCHAR(100),
+PRIMARY KEY (InventoryID)
+);
+
+CREATE TABLE tbl_AddStock(
+AddID INT(8) ZEROFILL AUTO_INCREMENT,
+InventoryID INT(8) ZEROFILL NOT NULL,
+Date Date NOT NULL,
+Quantity INT NOT NULL, 
+UnitPrice DOUBLE(10,2) NOT NULL,
+TotalPrice DOUBLE(10,2) NOT NULL, 
+Remarks VARCHAR(200),
+PRIMARY KEY (AddID),
+FOREIGN KEY (InventoryID) REFERENCES tbl_Inventory(InventoryID)
+);
+
+CREATE TABLE tbl_UsageManagement(
+UsageID INT(8) ZEROFILL AUTO_INCREMENT,
+InventoryID INT(8) ZEROFILL NOT NULL,
+Date DATE NOT NULL,
+Quantity INT NOT NULL,
+Remarks VARCHAR(200),
+ProjectID INT(8) ZEROFILL,
+UpdatedBy INT(8) ZEROFILL NOT NULL,
+PRIMARY KEY (UsageID),
+FOREIGN KEY (InventoryID) REFERENCES tbl_Inventory(InventoryID),
+FOREIGN KEY (ProjectID) REFERENCES tbl_Project(ProjectID),
+FOREIGN KEY (UpdatedBy) REFERENCES tbl_UserManagement(UserID)
+);
+
+CREATE TABLE tbl_IncomeExpenses(
+IEID INT(8) ZEROFILL AUTO_INCREMENT,
+ProjectID INT(8) ZEROFILL NOT NULL,
+Details VARCHAR(100),
+Type ENUM("Income", "Expenses") NOT NULL,
+Date DATE NOT NULL,
+Category VARCHAR(20),
+Amount DOUBLE(10,2) NOT NULL,
+Attachment VARCHAR(100),
+ClaimedBy INT(8) ZEROFILL,
+PRIMARY KEY (IEID),
+FOREIGN KEY (ProjectID) REFERENCES tbl_Project(ProjectID),
+FOREIGN KEY (ClaimedBy) REFERENCES tbl_UserManagement(UserID)
+);

@@ -1,0 +1,43 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Add Income{% endblock %}
+{% block header %}Add Income{% endblock %} 
+{% block content %}
+{% for info in user%}
+<h5>
+    <form action="/staff/{{info.UserID}}/addIncome" method="post" enctype="multipart/form-data">
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p> 
+                <h2>DETAILS<br></h2>
+                    <label for="ProjectID">Select Project</label>
+                    <select name="ProjectID" id="ProjectID">
+                    {% for data in project %}
+                        <option value="{{data.ProjectID}}">{{data.ProjectID}} - {{data.ProjectName}} - {{data.ProjectStatus}}</option>
+                    {% endfor %} 
+                    </select><br>
+                    <label for="Details">Details</label>
+                    <input type="text" name="Details" required /> <br>
+                    <label for="Date">Date</label>
+                    <input type="date" name="Date" required /> <br>
+                    <label for="Category">Category</label>
+                    <input type="text" name="Category" required /> <br>
+                    <label for="Amount">Amount</label>
+                    <input type="number" name="Amount" step='0.01' required /> <br>
+                    <label for="Attachment">Upload Document</label>
+                    <input type="file" name="Attachment"  required> <br>
+                    <label for="ClaimedBy">Select Claimed By</label>
+                    <select name="ClaimedBy" id="ClaimedBy">
+                    {% for data in allUser %}
+                        <option value="{{data.UserID}}">{{data.UserID}} - {{data.Name}}</option>
+                    {% endfor %} 
+                    </select><br>
+            </p>
+        </div> 
+        <input type="submit" value="Submit" /> <br>
+        <input type="button" value="Back" onclick="history.back()">         
+    </div>
+    </form>
+</h5>
+
+{% endfor %}
+{% endblock %}

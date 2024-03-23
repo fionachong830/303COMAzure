@@ -1,0 +1,142 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Edit Invoice{% endblock %}
+{% block header %}Edit Invoice{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for data in invoice%}
+<h5>
+    <form action="/staff/{{info.UserID}}/invoice/{{data.InvoiceID}}/edit" method="post">
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>PROJECT DETAILS <br></h2>
+                <label for="ProjectID"> Project</label>
+                {{data.ProjectID}} - {{data.ProjectName}} - {{data.ProjectStatus}} <span><a href="/staff/{{info.UserID}}/project/{{data.ProjectID}}/view"><i class='bx bxs-notepad' ></i></a></span>
+                <input type="hidden" name="ProjectID" value={{data.ProjectID}} />
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>INVOICE DETAILS<br></h2>
+                    <label for="InvoiceTitle">Invoice Title</label>
+                    <input type="text" name="InvoiceTitle" required value="{{data.InvoiceTitle}}"/> <br>
+                    <label for="ToField">To</label>
+                    <input type="text" name="ToField" required value="{{data.ToField}}"/> <br>
+                    <label for="Attn">Attn</label>
+                    <input type="text" name="Attn" required value="{{data.Attn}}"/> <br>
+                    <label for="Remarks">Remarks</label>
+                    <input type="text" name="Remarks" required value="{{data.Remarks}}"/> <br>
+                    <label for="BankAccountNo">Bank Account Number</label>
+                    <input type="text" name="BankAccountNo" required value="{{data.BankAccountNo}}"/> <br>
+                    <label for="DueDate">Due Date</label>
+                    <input type="date" name="DueDate" required value="{{data.DueDate}}"/> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>INVOICE DETAIL LINES<br></h2><br> 
+                <div class="buttons">
+                    <label for="Add" >+ Detail Line</label>
+                </div><br> 
+                <table id="myTable">
+                    <thead>
+                        <tr>
+                            <th>Work ID</th>
+                            <th>Work Description</th>
+                            <th>Unit Rate</th>
+                            <th>Quantity</th>
+                            <th>Quantifier</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                {% for line in invoiceLine%}
+                <tr>
+                    <td>{{line.WorkID}}</td>
+                    <td>{{line.WorkDescription}}</td>
+                    <td>{{line.UnitRate}}</td>
+                    <td>{{line.Quantity}}</td>
+                    <td>{{line.Quantifier}}</td>
+                    <td>{{line.Amount}}</td>
+                    <td>
+                        <span>
+                            <div class="buttons">
+                                <label for="{{line.WorkID}}" ><i class='bx bxs-edit-alt' ></i></label>
+                            </div>
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+                </table>
+            </p>
+        </div>
+        <input type="submit" value="Submit" /> <br>
+        <input type="button" value="Back" onclick="history.back()">         
+    </div>
+    </form>
+
+    <input class="modal-state_cus" id="Add" type="checkbox" />
+    <div class="modal_cus">
+        <label class="modal__bg_cus" for="Add"></label>
+        <div class="modal__inner_cus">
+            <label class="modal__close_cus" for="Add"></label>
+            <h2>Add Detail Line</h2>
+            <div class="background-box-yellow">
+                <div class="fill-in">
+                    <form action="/staff/{{info.UserID}}/invoice/{{data.InvoiceID}}/edit/add" method="post">
+                        <input type="hidden" name="ProjectID" value={{data.ProjectID}} />
+                        <label for="WorkDescription">Work Description</label>
+                        <input type="text" name="WorkDescription" required /> <br>
+                        <label for="UnitRate">Unit Rate</label>
+                        <input type="number" name="UnitRate" step='0.01' required /> <br>
+                        <label for="Quantity">Quantity</label>
+                        <input type="number" name="Quantity" required /> <br>
+                        <label for="Quantifier">Quantifier</label>
+                        <input type="text" name="Quantifier" required /> <br>
+                        <input type="submit" value="Submit" /> <br>
+                    </form>
+                </div>    
+            </div>
+        </div>
+    </div>
+
+{% for line in invoiceLine%}
+    <input class="modal-state_cus" id="{{line.WorkID}}" type="checkbox" />
+    <div class="modal_cus">
+        <label class="modal__bg_cus" for="{{line.WorkID}}"></label>
+        <div class="modal__inner_cus">
+            <label class="modal__close_cus" for="{{line.WorkID}}"></label>
+            <h2>Edit Detail Line</h2>
+            <div class="background-box-yellow">
+                <div class="fill-in">
+                    <form action="/staff/{{info.UserID}}/invoice/{{data.InvoiceID}}/edit/{{line.WorkID}}" method="post">
+                        <input type="hidden" name="ProjectID" value={{data.ProjectID}} />
+                        <label for="WorkID">Work ID</label>
+                        {{line.WorkID}} <br>
+                        <label for="WorkDescription">Work Description</label>
+                        <input type="text" name="WorkDescription" required value="{{line.WorkDescription}}"/> <br>
+                        <label for="UnitRate">Unit Rate</label>
+                        <input type="number" name="UnitRate" step='0.01' required value="{{line.UnitRate}}"/> <br>
+                        <label for="Quantity">Quantity</label>
+                        <input type="number" name="Quantity" required value="{{line.Quantity}}"/> <br>
+                        <label for="Quantifier">Quantifier</label>
+                        <input type="text" name="Quantifier" required value="{{line.Quantifier}}"/> <br>
+                        <input type="submit" value="Submit" /> <br>
+                    </form>
+                </div>    
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+{% endfor %}
+{% endfor %}
+{% if status == 'Invalid Project Status' %}
+The project status is not equal to 'Project Start' or 'Warranty Start'. Cannot edit. 
+{% endif %} 
+{% if status == 'Invalid Invoice Status' %}
+The invoice status is not equal to 'New'. Cannot edit.
+{% endif %} 
+<br><input type="button" value="Back" onclick="history.back()"> 
+</h5>
+{% endblock %}
