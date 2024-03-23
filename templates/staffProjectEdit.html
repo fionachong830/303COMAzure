@@ -1,0 +1,194 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Edit Project{% endblock %}
+{% block header %}Edit Project{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for data in project%}
+<h5>
+    <div class="buttons">
+        <button type="button" onclick="window.location.href='/staff/{{info.UserID}}/project/{{data.ProjectID}}/edit/projectEnd'">Project End</button>
+    </div>
+    {% if status == 'Invalid Project Status' %}
+    The project status is not "Warranty Start".
+    {% endif %}  
+    {% if status == 'Invalid Amount' %}
+    The amount received or invoiced is not equal to the amount in the quotation.
+    {% endif %}  
+    {% if status == 'Warranty not yet end' %}
+    The warranty period hasn't end. 
+    {% endif %}  
+    {% if status == 'Project not yet end' %}
+    The project hasn't end. 
+    {% endif %}  
+    <form action="/staff/{{info.UserID}}/project/{{data.ProjectID}}/edit" method="post" enctype="multipart/form-data">
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>CUSTOMER DETAILS <br></h2>
+                <label for="CustomerID">Customer</label>
+                    {{data.CustomerID}} - {{data.CompanyName}} - {{data.ContactPerson}}
+                </select><br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>PROJECT DETAILS<br></h2> 
+                    <label for="ProjectID">Project ID</label>
+                    {{data.ProjectID}} <br>
+                    <label for="ProjectName">Project Name</label>
+                    <input type="text" name="ProjectName" required value="{{data.ProjectName}}"/> <br>
+                    <label for="Description">Description</label>
+                    <input type="text" name="Description" required value="{{data.Description}}"/> <br>
+                    <label for="Location">Location</label>
+                    <input type="text" name="Location" required value="{{data.Location}}"/> <br>
+                    <label for="ProjectAttachment">Upload Document</label>
+                    {{data.ProjectAttachment}}  <br>
+                    <label for="ProjectStatus">Project Status</label>
+                    {{data.ProjectStatus}} <br>
+                    <label for="ClosedBy">Closed By</label>
+                    {{data.ClosedBy}} <br>
+                    <div class="buttons">
+                        <label for="{{data.ProjectName}}" >Edit Attachment</label>
+                    </div><br> 
+                    <span><a href='/staff/{{info.UserID}}/project/{{data.ProjectID}}/closeProject'><p style="color: red;">Close Project</p></a></span>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>PROJECT PERIOD<br></h2>
+                    <label for="StartDate">Start Date</label>
+                    <input type="date" name="StartDate" value="{{data.StartDate}}"/> <br>
+                    <label for="EndDate">End Date</label>
+                    <input type="date" name="EndDate" value="{{data.EndDate}}"/> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>Warranty Period<br></h2>
+                    <label for="WarrantyStart">Warranty Start</label>
+                    <input type="date" name="WarrantyStart" value="{{data.WarrantyStart}}"/> <br>
+                    <label for="WarrantyEnd">Warranty End</label>
+                    <input type="date" name="WarrantyEnd" value="{{data.WarrantyEnd}}"/> <br>
+                    <div class="buttons">
+                        <label for="StartWarranty" >Start Warranty Period</label>
+                    </div>
+                    <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>Warranty Period<br></h2>
+                    <label for="WarrantyStart">Warranty Start</label>
+                    {{data.WarrantyStart}} <br>
+                    <label for="WarrantyEnd">Warranty End</label>
+                    {{data.WarrantyEnd}} <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>Quotation and Invoice<br></h2>
+                    <label for="TotalAmount">Confirmed Quotation Amount</label>
+                    {{data.TotalAmount}} <br>
+                    <label for="Invoiced">Invoiced Amount</label>
+                    {{data.Invoiced}} <br>
+                    <label for="AmountReceived">Amount Received</label>
+                    {{data.AmountReceived}} <br>
+                    <span><a href="/staff/{{info.UserID}}/addQuote"><i class='bx bxs-plus-circle' >Quotation </i></a></span> <br>
+                    <span><a href="/staff/{{info.UserID}}/addInvoice"><i class='bx bxs-plus-circle' >Invoice</i></a></span>
+            </p>
+        </div>    
+    </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>ACTIVITY DETAILS <span><a href="/staff/{{info.UserID}}/addActivity"><i class='bx bxs-plus-circle' ></i></a></span><br></h2>
+                <table id="myTable" class="table-sort table-arrows">
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    {% for data in activity%}
+                    <tr>
+                        <td>{{data.ActivityID}} - {{data.ActivityName}}</td>
+                        <td>{{data.ActivityLocation}}</td>
+                        <td>{{data.ActivityStatus}}</td>
+                        <td>{{data.ActivityStartDate}}</td>
+                        <td>{{data.ActivityEndDate}}</td>
+                        <td>
+                            <span><a href="/staff/{{info.UserID}}/activity/{{data.ActivityID}}/view"><i class='bx bxs-notepad' ></i></a></span> |
+                            <span><a href="/staff/{{info.UserID}}/activity/{{data.ActivityID}}/edit"><i class='bx bxs-edit-alt' ></i></a></span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </p>
+        </div>
+        <br>
+        {% if status == 'phoneNodup' %}
+        The first contact person phone number duplicated. Please use another phone number. Thank you!
+        {% endif %}
+        {% if status == 'emaildup' %}
+        The first contact person email duplicated. Please use another email. Thank you!
+        {% endif %}
+        {% if status == 'invalidConfirmPassword' %}
+        The confirm password is not same with the password. Please try again. Thank you!
+        {% endif %}
+        {% if status == 'success' %}
+        Saved successfully. Thank you!
+        {% endif %} 
+        {% if status == 'Invalid Status for Start Warranty' %}
+        The project status not "Project Start". Cannot start warranty.
+        {% endif %} 
+        <br> 
+        <input type="submit" value="Submit" /> <br>
+        <input type="button" value="Back" onclick="history.back()">     
+    </div>
+    </form>
+    <input class="modal-state_cus" id="{{data.ProjectName}}" type="checkbox" />
+    <div class="modal_cus">
+        <label class="modal__bg_cus" for="{{data.ProjectName}}"></label>
+        <div class="modal__inner_cus">
+            <label class="modal__close_cus" for="{{data.ProjectName}}"></label>
+            <h2>Edit Attachment</h2>
+            <div class="background-box-yellow">
+                <div class="fill-in">
+                    {% for info in user %}
+                    <form action="/staff/{{info.UserID}}/project/{{data.ProjectID}}/edit/submitpic" method="post" enctype="multipart/form-data">
+                    {% endfor %}
+                        <label for="ProjectAttachment">Upload Document</label>
+                        <input type="file" name="ProjectAttachment"  required> <br>
+                        <input type="submit" value="Upload" />
+                    </form>
+                </div>    
+            </div>
+        </div>
+    </div>
+
+    <input class="modal-state_cus" id="StartWarranty" type="checkbox" />
+    <div class="modal_cus">
+        <label class="modal__bg_cus" for="StartWarranty"></label>
+        <div class="modal__inner_cus">
+            <label class="modal__close_cus" for="StartWarranty"></label>
+            <h2>Start Warranty Period</h2>
+            <div class="background-box-yellow">
+                <div class="fill-in">
+                    <form action="/staff/{{info.UserID}}/project/{{data.ProjectID}}/edit/startWarranty" method="post">
+                        <label for="WarrantyStart">Warranty Start</label>
+                        <input type="date" name="WarrantyStart" required value="{{data.WarrantyStart}}"/> <br>
+                        <label for="WarrantyEnd">Warranty End</label>
+                        <input type="date" name="WarrantyEnd" required value="{{data.WarrantyEnd}}"/> <br>
+                        <input type="submit" value="Confirm" />
+                    </form>
+                </div> 
+            </div>
+        </div>
+    </div>
+</h5>
+{% endfor %}
+{% endfor %}
+{% endblock %}

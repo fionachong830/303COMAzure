@@ -1,0 +1,128 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}View Quote{% endblock %}
+{% block header %}View Quote{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for data in quotation%}
+<h5>
+    <div class="buttons">
+        <button type="button" onclick="window.location.href='/customer/{{info.CustomerID}}/quote/{{data.QuotationID}}/view/report'">Download Report</button>
+    </div> <br>
+    <div class="buttons">
+        <label for="confirm" >Confirm</label>
+    </div> <br> <br>
+    <div class="buttons">
+        <label for="reject" >Reject</label>
+    </div><br> 
+    {% if status == 'Invalid Submit Status' %}
+    The project status is not "Pending for Quotation" or the quotation status is not "New".
+    {% endif %}  
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>PROJECT DETAILS <br></h2>
+                <label for="ProjectID"> Project</label>
+                {{data.ProjectID}} - {{data.ProjectName}} - {{data.ProjectStatus}}<span><a href="/customer/{{info.CustomerID}}/project/{{data.ProjectID}}/view"><i class='bx bxs-notepad' ></i></a></span> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>QUOTATION DETAILS<br></h2> 
+                    <label for="QuotationTitle">Quotation Title</label>
+                    {{data.QuotationTitle}} <br>
+                    <label for="QuotationStatus">Quotation Status</label>
+                    {{data.QuotationStatus}} <br>
+                    <label for="QuotationDate"> Quotation Date</label>
+                    {{data.QuotationDate}} <br>
+                    <label for="ToField">To</label>
+                    {{data.ToField}} <br>
+                    <label for="Attn">Attn</label>
+                    {{data.Attn}} <br>
+                    <label for="Remarks">Remarks</label>
+                    {{data.Remarks}}<br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>QUOTATION DETAIL LINES<br></h2><br> 
+                <table id="myTable">
+                    <thead>
+                        <tr>
+                            <th>Work ID</th>
+                            <th>Work Description</th>
+                            <th>Unit Rate</th>
+                            <th>Quantity</th>
+                            <th>Quantifier</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                {% for line in quotationLine%}
+                <tr>
+                    <td>{{line.WorkID}}</td>
+                    <td>{{line.WorkDescription}}</td>
+                    <td>{{line.UnitRate}}</td>
+                    <td>{{line.Quantity}}</td>
+                    <td>{{line.Quantifier}}</td>
+                    <td>{{line.Amount}}</td>
+                </tr>
+                {% endfor %}
+                </table>
+                <br><label for="GrantTotal">Grant Total</label>
+                $ {{data.GrantTotal}} <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>CONFIRMATION DETAILS<br></h2> 
+                    <label for="ConfirmedBy">Confirmed By</label>
+                    {{data.ConfirmedBy}} <br>
+                    <label for="ConfirmedWith">Confirmed With</label>
+                    {{data.ConfirmedWith}} <br>
+                    <label for="ConfirmedTime"> Confirmed Time</label>
+                    {{data.ConfirmedTime}} <br>
+            </p>
+        </div>    
+        <input type="button" value="Back" onclick="history.back()">   
+    </div>
+    <input class="modal-state_cus" id="confirm" type="checkbox" />
+    <div class="modal_cus">
+        <label class="modal__bg_cus" for="confirm"></label>
+        <div class="modal__inner_cus">
+            <label class="modal__close_cus" for="confirm"></label>
+            <h2>Confirmation on Confirm Quotation</h2>
+            <div class="background-box-yellow">
+                <div class="fill-in">
+                    <form action="/customer/{{info.CustomerID}}/quote/{{data.QuotationID}}/view/confirm" method="post">
+                        <label for="ConfirmedWith">Confirmed With</label>
+                        <input type="text" name="ConfirmedWith" required /> <br>
+                        <label for="ConfirmedTime">Confirm Date</label>
+                        <input type="date" name="ConfirmedTime" required /> <br>
+                        <input type="submit" value="Submit" /> <br>
+                    </form>
+                </div>    
+            </div>
+        </div>
+    </div>
+    <input class="modal-state_cus" id="reject" type="checkbox" />
+    <div class="modal_cus">
+        <label class="modal__bg_cus" for="reject"></label>
+        <div class="modal__inner_cus">
+            <label class="modal__close_cus" for="reject"></label>
+            <h2>Confirmation on Reject Quotation</h2>
+            <div class="background-box-yellow">
+                <div class="fill-in">
+                    <form action="/customer/{{info.CustomerID}}/quote/{{data.QuotationID}}/view/reject" method="post">
+                        <label for="ConfirmedWith">Confirmed With</label>
+                        <input type="text" name="ConfirmedWith" required /> <br>
+                        <label for="ConfirmedTime">Confirm Date</label>
+                        <input type="date" name="ConfirmedTime" required /> <br>
+                        <input type="submit" value="Submit" /> <br>
+                    </form>
+                </div>    
+            </div>
+        </div>
+    </div>
+</h5>
+{% endfor %}
+{% endfor %}
+{% endblock %}

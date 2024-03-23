@@ -1,0 +1,62 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Edit Income/Expenses{% endblock %}
+{% block header %}Edit Income/Expenses{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for record in record%}
+<h5>
+    <form action="/staff/{{info.UserID}}/IncomeExpenses/{{record.IEID}}/edit" method="post" enctype="multipart/form-data">
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p> 
+                <h2>DETAILS<br></h2>
+                    <label for="IEID">Record ID</label>
+                    {{record.IEID}} <br>
+                    <label for="Type">Record Type</label>
+                    {{record.Type}} <br>
+                    <label for="ProjectID">Select Project</label>
+                    {{record.ProjectID}}<br>
+                    <label for="Details">Details</label>
+                    <input type="text" name="Details" required value="{{record.Details}}"/> <br>
+                    <label for="Date">Date</label>
+                    <input type="date" name="Date" required value="{{record.Date}}"/> <br>
+                    <label for="Category">Category</label>
+                    <input type="text" name="Category" required value="{{record.Category}}"/> <br>
+                    <label for="Amount">Amount</label>
+                    <input type="number" name="Amount" step='0.01' required value="{{record.Amount}}"/> <br>
+                    <label for="Attachment">Attachment</label>
+                    {{record.Attachment}} 
+                    <div class="buttons">
+                        <label for="{{record.Attachment}}" >Edit Attachment</label>
+                    </div>
+                    <br> 
+                    <label for="ClaimedBy">Select Claimed By</label>
+                    {{record.ClaimedBy}}<br>
+            </p>
+        </div> 
+        <input type="submit" value="Submit" /> <br>
+        <input type="button" value="Back" onclick="history.back()">         
+    </div>
+    </form>
+
+    <input class="modal-state_cus" id="{{record.Attachment}}" type="checkbox" />
+    <div class="modal_cus">
+        <label class="modal__bg_cus" for="{{record.Attachment}}"></label>
+        <div class="modal__inner_cus">
+            <label class="modal__close_cus" for="{{record.Attachment}}"></label>
+            <h2>Edit Attachment</h2>
+            <div class="background-box-yellow">
+                <div class="fill-in">
+                    <form action="/staff/{{info.UserID}}/IncomeExpenses/{{record.IEID}}/edit/submitpic" method="post" enctype="multipart/form-data">
+                        <label for="Attachment">Upload Document</label>
+                        <input type="file" name="Attachment"  required> <br>
+                        <input type="submit" value="Upload" />
+                    </form>
+                </div>    
+            </div>
+        </div>
+    </div>
+</h5>
+{% endfor %}
+{% endfor %}
+{% endblock %}

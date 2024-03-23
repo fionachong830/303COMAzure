@@ -1,0 +1,51 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Add Invoice{% endblock %}
+{% block header %}Add Invoice{% endblock %} 
+{% block content %}
+{% for info in user%}
+<h5>
+    <form action="/staff/{{info.UserID}}/addInvoice" method="post">
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>PROJECT DETAILS <br></h2>
+                <label for="ProjectID">Select Project</label>
+                <select name="ProjectID" id="ProjectID">
+                  {% for data in project %}
+                    <option value="{{data.ProjectID}}">{{data.ProjectID}} - {{data.ProjectName}}
+                        Confirmed Quotation Amount: {{data.TotalAmount}} <br>
+                        Invoiced Amount: {{data.Invoiced}} <br>
+                    </option>
+                  {% endfor %} 
+                </select><br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>INVOICE DETAILS<br></h2>
+                    <label for="InvoiceTitle">Invoice Title</label>
+                    <input type="text" name="InvoiceTitle" required /> <br>
+                    <label for="ToField">To</label>
+                    <input type="text" name="ToField" required /> <br>
+                    <label for="Attn">Attn</label>
+                    <input type="text" name="Attn" required /> <br>
+                    <label for="Remarks">Remarks</label>
+                    <input type="text" name="Remarks" required /> <br>
+                    <label for="BankAccountNo">Bank Account Number</label>
+                    <input type="number" name="BankAccountNo" required value="27068004900"/> <br>                    
+                    <label for="DueDate">Due Date</label>
+                    <input type="date" name="DueDate" required /> <br>
+            </p>
+        </div>
+        {% if status == 'Invalid Status' %}
+        The project status is not "Project Start" or "Warranty Start".
+        {% endif %} 
+        <br>
+        <input type="submit" value="Submit" /> <br>
+        <input type="button" value="Back" onclick="history.back()">         
+    </div>
+    </form>
+</h5>
+
+{% endfor %}
+{% endblock %}

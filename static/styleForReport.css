@@ -1,0 +1,47 @@
+/* Google Fonts Import Link */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+*{
+  margin: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+
+/* [Object] Modal For table
+ * =============================== */
+table  {
+  border-collapse:collapse;
+  border-spacing:0;
+}
+
+table td{
+  border-color:black;
+  border-style:solid;
+  border-width:1px;
+  font-size:14px;
+  overflow:hidden;
+  padding:10px 20px;
+  word-break:normal;
+  background-color:#ffffff;
+  color:#000000;
+  text-align:left;
+  vertical-align:middle
+  
+}
+
+table th{
+  border-color:black;
+  border-style:solid;
+  border-width:1px;
+  font-size:14px;
+  font-weight:normal;
+  overflow:hidden;
+  padding: 10px 20px;
+  word-break:normal;
+  background-color:#ffffff;
+  color:#000000;
+  font-weight:bold;
+  text-align:center;
+  vertical-align:middle
+}

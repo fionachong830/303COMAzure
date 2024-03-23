@@ -1,0 +1,92 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}View Invoice{% endblock %}
+{% block header %}View Invoice{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for data in invoice%}
+<h5>
+    <div class="buttons">
+        <button type="button" onclick="window.location.href='/customer/{{info.CustomerID}}/invoice/{{data.InvoiceID}}/view/report'">Download Report</button>
+    </div> 
+    {% if status == 'Invalid Submit Status' %}
+    The project status is not "Project Start" or "Warranty Start" / The invoice status is not "New".
+    {% endif %}  
+    {% if status == 'Invalid accept/reject Status' %}
+    The project status is not "Project Start" or "Warranty Start"/ The invoice status is not "Pending for Payment".
+    {% endif %}  
+    {% if status == 'Invalid Amount' %}
+    The total amount in quotation is smaller than the invoiced amount + the grant total amount in this invoice.
+    {% endif %}  
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>PROJECT DETAILS <br></h2>
+                <label for="ProjectID"> Project</label>
+                {{data.ProjectID}} - {{data.ProjectName}} - {{data.ProjectStatus}}<span><a href="/staff/{{info.CustomerID}}/project/{{data.ProjectID}}/view"><i class='bx bxs-notepad' ></i></a></span> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>INVOICE DETAILS<br></h2>
+                    <label for="InvoiceTitle">Invoice Title</label>
+                    {{data.InvoiceTitle}} <br>
+                    <label for="InvoiceStatus">Invoice Status</label>
+                    {{data.InvoiceStatus}} <br>
+                    <label for="InvoiceDate"> Invoice Date</label>
+                    {{data.InvoiceDate}} <br>
+                    <label for="ToField">To</label>
+                    {{data.ToField}} <br>
+                    <label for="Attn">Attn</label>
+                    {{data.Attn}} <br>
+                    <label for="Remarks">Remarks</label>
+                    {{data.Remarks}}<br>
+                    <label for="BankAccountNo">Bank Account Number</label>
+                    {{data.BankAccountNo}} <br>  
+                    <label for="DueDate">Due Date</label>
+                    {{data.DueDate}}<br>
+                    <label for="PayDate">Pay Date</label>
+                    {{data.PayDate}}<br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>INVOICE DETAIL LINES<br></h2><br> 
+                <table id="myTable">
+                    <thead>
+                        <tr>
+                            <th>Work ID</th>
+                            <th>Work Description</th>
+                            <th>Unit Rate</th>
+                            <th>Quantity</th>
+                            <th>Quantifier</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                {% for line in invoiceLine%}
+                <tr>
+                    <td>{{line.WorkID}}</td>
+                    <td>{{line.WorkDescription}}</td>
+                    <td>{{line.UnitRate}}</td>
+                    <td>{{line.Quantity}}</td>
+                    <td>{{line.Quantifier}}</td>
+                    <td>{{line.Amount}}</td>
+                </tr>
+                {% endfor %}
+                </table>
+                <br><label for="GrantTotal">Grant Total</label>
+                $ {{data.GrantTotal}} <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>CONFIRMATION DETAILS<br></h2> 
+                    <label for="ConfirmedBy">Confirmed By</label>
+                    {{data.ConfirmedBy}} <br>
+            </p>
+        </div>    
+        <input type="button" value="Back" onclick="history.back()">   
+    </div>
+</h5>
+{% endfor %}
+{% endfor %}
+{% endblock %}

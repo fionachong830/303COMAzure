@@ -1,0 +1,70 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Update Personal Profile{% endblock %}
+{% block header %}Update Personal Profile{% endblock %} 
+{% block content %}
+{% for info in user%}
+{% for data in customer%}
+<h5>
+    <form action="/customer/{{info.CustomerID}}/profileEdit" method="post">
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>BASIC DETAILS <br></h2>
+                    <label for="CompanyName">Company Name</label>
+                    <input type="text" name="CompanyName" required value="{{data.CompanyName}}"/> <br>
+                    <label for="CompanyType">Company Type</label>
+                    <input type="text" name="CompanyType" required value="{{data.CompanyType}}"/> <br>
+                    <label for="Password">Password</label>
+                    <input type="text" name="Password" required value="{{data.Password}}"/> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>PRIMARY CONTACT (MUST FILL)<br></h2>
+                    <label for="ContactPerson">Name</label>
+                    <input type="text" name="ContactPerson" required value="{{data.ContactPerson}}"/> <br>
+                    <label for="PhoneNo">Phone Number</label>
+                    <input type="tel" name="PhoneNo" required value="{{data.PhoneNo}}"/> <br>
+                    <label for="Email">Email</label>
+                    <input type="email" name="Email" required value="{{data.Email}}"/> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>SECOND CONTACT (OPTIONAL)<br></h2>
+                    <label for="SecondContact">Name</label>
+                    <input type="text" name="SecondContact" value="{{data.SecondContact}}"/> <br>
+                    <label for="SecondContactPhone">Phone Number</label>
+                    <input type="tel" name="SecondContactPhone" value="{{data.SecondContactPhone}}"/> <br>
+                    <label for="SecondContactEmail">Email</label>
+                    <input type="text" name="SecondContactEmail" value="{{data.SecondContactEmail}}"/> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>ADDRESS <br></h2>
+                    <label for="BillingAddress">Billing Address</label>
+                    <input type="text" name="BillingAddress" required value="{{data.BillingAddress}}"/> <br>
+                    <label for="PrimaryAddress">Primary Address</label>
+                    <input type="text" name="PrimaryAddress" required value="{{data.PrimaryAddress}}"/> <br>
+            </p>
+        </div>
+        <br>
+        {% if status == 'phoneNodup' %}
+        The first contact person phone number duplicated. Please use another phone number. Thank you!
+        {% endif %}
+        {% if status == 'emaildup' %}
+        The first contact person email duplicated. Please use another email. Thank you!
+        {% endif %}
+        {% if status == 'success' %}
+        Saved successfully. Thank you!
+        {% endif %} 
+        <br> 
+                <input type="submit" value="Submit" /> <br>
+                <input type="button" value="Back" onclick="history.back()">         
+    </div>
+    </form>
+</h5>
+{% endfor %}
+{% endfor %}
+{% endblock %}

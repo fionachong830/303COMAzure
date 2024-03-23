@@ -1,0 +1,74 @@
+{% if role=='Admin'%}{% extends "/bootstrap/baseStaff.html" %}{% endif %}{% if role=='Normal'%}{% extends "/bootstrap/baseNormal.html" %}{% endif %}{% if role=='Customer'%}{% extends "/bootstrap/baseCustomer.html" %}{% endif %}
+{% block title %}Add Customer{% endblock %}
+{% block header %}Add Customer{% endblock %} 
+{% block content %}
+{% for info in user%}
+<h5>
+    <form action="/staff/{{info.UserID}}/addCustomer" method="post">
+    <div class="fill-in">
+        <div class="background-box-yellow">
+            <p>
+                <h2>BASIC DETAILS <br></h2>
+                    <label for="CompanyName">Company Name</label>
+                    <input type="text" name="CompanyName" required /> <br>
+                    <label for="CompanyType">Company Type</label>
+                    <input type="text" name="CompanyType" required /> <br>
+                    <label for="Password">Password</label>
+                    <input type="password" name="Password" required /> <br>
+                    <label for="ConfirmPassword">Confirm Password</label>
+                    <input type="password" name="ConfirmPassword" required /> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>PRIMARY CONTACT (MUST FILL)<br></h2>
+                    <label for="ContactPerson">Name</label>
+                    <input type="text" name="ContactPerson" required /> <br>
+                    <label for="PhoneNo">Phone Number</label>
+                    <input type="tel" name="PhoneNo" required /> <br>
+                    <label for="Email">Email</label>
+                    <input type="email" name="Email" required /> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>SECOND CONTACT (OPTIONAL)<br></h2>
+                    <label for="SecondContact">Name</label>
+                    <input type="text" name="SecondContact" /> <br>
+                    <label for="SecondContactPhone">Phone Number</label>
+                    <input type="tel" name="SecondContactPhone" /> <br>
+                    <label for="SecondContactEmail">Email</label>
+                    <input type="email" name="SecondContactEmail" /> <br>
+            </p>
+        </div>
+        <div class="background-box-yellow">
+            <p>
+                <h2>ADDRESS <br></h2>
+                    <label for="BillingAddress">Billing Address</label>
+                    <input type="text" name="BillingAddress" required /> <br>
+                    <label for="PrimaryAddress">Primary Address</label>
+                    <input type="text" name="PrimaryAddress" required /> <br>
+            </p>
+        </div>
+        <br>
+        {% if status == 'phoneNodup' %}
+        The first contact person phone number duplicated. Please use another phone number. Thank you!
+        {% endif %}
+        {% if status == 'emaildup' %}
+        The first contact person email duplicated. Please use another email. Thank you!
+        {% endif %}
+        {% if status == 'invalidConfirmPassword' %}
+        The confirm password is not same with the password. Please try again. Thank you!
+        {% endif %}
+        {% if status == 'success' %}
+        Created successfully. Thank you!
+        {% endif %} 
+        <br> 
+                <input type="submit" value="Submit" /> <br>
+                <input type="button" value="Back" onclick="history.back()">         
+    </div>
+    </form>
+</h5>
+
+{% endfor %}
+{% endblock %}
