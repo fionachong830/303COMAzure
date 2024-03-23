@@ -55,17 +55,18 @@ app.config['MAIL_DEFAULT_SENDER'] = 'testingtestinguat2@gmail.com'
 os.environ.get('MAIL_DEFAULT_SENDER')
 mail = Mail(app)
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
+'''
 UPLOAD_FOLDER = '/Users/fionachong/Library/CloudStorage/OneDrive-個人/2324 Sem2/303COM/303 try/static/Project'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 UPLOAD_FOLDER_INVENTORY = '/Users/fionachong/Library/CloudStorage/OneDrive-個人/2324 Sem2/303COM/303 try/static/Inventory'
 app.config['UPLOAD_FOLDER_INVENTORY'] = UPLOAD_FOLDER_INVENTORY
 UPLOAD_FOLDER_IE = '/Users/fionachong/Library/CloudStorage/OneDrive-個人/2324 Sem2/303COM/303 try/static/IE'
 app.config['UPLOAD_FOLDER_IE'] = UPLOAD_FOLDER_IE
-
-bootstrap = Bootstrap(app)
 '''
+bootstrap = Bootstrap(app)
+
 try:
-   connection = pymysql.connect(user='fiona0830', password='Cn92112103', host='mysqlserverforfyp.mysql.database.azure.com', port=3306, database="FYP_FIONA", ssl_ca="DigiCertGlobalRootCA.crt.pem", ssl_disabled=False, local_infile = 1, cursorclass=pymysql.cursors.DictCursor)
+   connection = pymysql.connect(user=os.environ.get('AZURE_MYSQL_USER'), password=os.environ.get('AZURE_MYSQL_PASSWORD'), host=os.environ.get('AZURE_MYSQL_HOST'), port=3306, database="FYP_FIONA", ssl_ca="DigiCertGlobalRootCA.crt.pem", ssl_disabled=False, local_infile = 1, cursorclass=pymysql.cursors.DictCursor)
    print("Connection established")
 except mysql.connector.Error as err:
   if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -76,6 +77,7 @@ except mysql.connector.Error as err:
     print(err)
 else:
   cursor = connection.cursor()
+
 '''
 connection = pymysql.connect(host = 'localhost', 
     user = 'root',
@@ -83,7 +85,7 @@ connection = pymysql.connect(host = 'localhost',
     db = 'FYP_FIONA', 
     local_infile = 1,
     cursorclass=pymysql.cursors.DictCursor)
-
+'''
 
 def sendemail(email, subject, message):
     msg = Message(
