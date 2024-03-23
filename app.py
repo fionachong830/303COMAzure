@@ -16,8 +16,7 @@ from pymysql.err import InterfaceError
 
 app = Flask(__name__)
 
-connect_str = 'DefaultEndpointsProtocol=https;AccountName=fionafypstorageaccount;AccountKey=hNxD0hWMywsV2CrMiTAnkP7PeTtXI6v2aFuYrlI+LCUEEXxZFxoJDqK+CEKgcKrsgTfOLtUXGPgk+ASt/tOBIA==;EndpointSuffix=core.windows.net'
-#os.environ.get('AZURE_STORAGEFILE_CONNECTIONSTRING')
+connect_str = os.environ.get('AZURE_STORAGEFILE_CONNECTIONSTRING')
 # retrieve the connection string from the environment variable
 
 container_incomeexpenses = "incomeexpenses" # container name in which images will be store in the storage account
@@ -51,8 +50,7 @@ app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'apikey'
-app.config['MAIL_PASSWORD'] = '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'
-''''os.environ.get('SENDGRID_API_KEY')'''
+app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
 app.config['MAIL_DEFAULT_SENDER'] = 'testingtestinguat2@gmail.com'
 os.environ.get('MAIL_DEFAULT_SENDER')
 mail = Mail(app)
