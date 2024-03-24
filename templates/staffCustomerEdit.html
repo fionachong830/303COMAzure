@@ -5,7 +5,7 @@
 {% for info in user%}
 {% for data in customer%}
 <h5>
-    <form action="/customer/{{info.CustomerID}}/profileEdit" method="post">
+    <form action="/staff/{{info.UserID}}/customer/{{data.CustomerID}}/edit" method="post">
     <div class="fill-in">
         <div class="background-box-yellow">
             <p>
