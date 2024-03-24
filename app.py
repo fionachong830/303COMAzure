@@ -5,7 +5,7 @@ import pymysql
 import os
 from flask_mail import Mail, Message
 import pandas as pd
-import mysql.connector
+import mysql.connector 
 from distutils.log import debug
 from fileinput import filename
 from datetime import date
