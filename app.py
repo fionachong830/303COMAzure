@@ -16,8 +16,7 @@ from pymysql.err import InterfaceError
 
 app = Flask(__name__)
 
-connect_str = 'DefaultEndpointsProtocol=https;AccountName=fionafypstorageaccount;AccountKey=hNxD0hWMywsV2CrMiTAnkP7PeTtXI6v2aFuYrlI+LCUEEXxZFxoJDqK+CEKgcKrsgTfOLtUXGPgk+ASt/tOBIA==;EndpointSuffix=core.windows.net'
-#os.environ.get('AZURE_STORAGEFILE_CONNECTIONSTRING')
+connect_str = os.environ.get('AZURE_STORAGEFILE_CONNECTIONSTRING')
 # retrieve the connection string from the environment variable
 
 container_incomeexpenses = "incomeexpenses" # container name in which images will be store in the storage account
@@ -51,8 +50,7 @@ app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'apikey'
-app.config['MAIL_PASSWORD'] = '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'
-''''os.environ.get('SENDGRID_API_KEY')'''
+app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
 app.config['MAIL_DEFAULT_SENDER'] = 'testingtestinguat2@gmail.com'
 os.environ.get('MAIL_DEFAULT_SENDER')
 mail = Mail(app)
@@ -65,9 +63,9 @@ UPLOAD_FOLDER_IE = '/Users/fionachong/Library/CloudStorage/OneDrive-個人/2324 
 app.config['UPLOAD_FOLDER_IE'] = UPLOAD_FOLDER_IE
 
 bootstrap = Bootstrap(app)
-'''
+
 try:
-   connection = pymysql.connect(user='fiona0830', password='Cn92112103', host='mysqlserverforfyp.mysql.database.azure.com', port=3306, database="FYP_FIONA", ssl_ca="DigiCertGlobalRootCA.crt.pem", ssl_disabled=False, local_infile = 1, cursorclass=pymysql.cursors.DictCursor)
+   connection = pymysql.connect(user=os.environ.get('AZURE_MYSQL_USER'), password=os.environ.get('AZURE_MYSQL_PASSWORD'), host=os.environ.get('AZURE_MYSQL_HOST'), port=3306, database="FYP_FIONA", ssl_ca="DigiCertGlobalRootCA.crt.pem", ssl_disabled=False, local_infile = 1, cursorclass=pymysql.cursors.DictCursor)
    print("Connection established")
 except mysql.connector.Error as err:
   if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -85,7 +83,7 @@ connection = pymysql.connect(host = 'localhost',
     db = 'FYP_FIONA', 
     local_infile = 1,
     cursorclass=pymysql.cursors.DictCursor)
-
+'''
 
 def sendemail(email, subject, message):
     msg = Message(
