@@ -20,6 +20,9 @@
     {% if status == 'Project not yet end' %}
     The project hasn't end. 
     {% endif %}  
+    {% if status == 'Invalid activity Status' %}
+    Some activities haven't end. 
+    {% endif %}  
     <form action="/staff/{{info.UserID}}/project/{{data.ProjectID}}/edit" method="post" enctype="multipart/form-data">
     <div class="fill-in">
         <div class="background-box-yellow">
@@ -73,15 +76,6 @@
                         <label for="StartWarranty" >Start Warranty Period</label>
                     </div>
                     <br>
-            </p>
-        </div>
-        <div class="background-box-yellow">
-            <p>
-                <h2>Warranty Period<br></h2>
-                    <label for="WarrantyStart">Warranty Start</label>
-                    {{data.WarrantyStart}} <br>
-                    <label for="WarrantyEnd">Warranty End</label>
-                    {{data.WarrantyEnd}} <br>
             </p>
         </div>
         <div class="background-box-yellow">

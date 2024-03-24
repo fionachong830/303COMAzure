@@ -16,7 +16,8 @@ from pymysql.err import InterfaceError
 
 app = Flask(__name__)
 
-connect_str = os.environ.get('AZURE_STORAGEFILE_CONNECTIONSTRING')
+connect_str = 'DefaultEndpointsProtocol=https;AccountName=fionafypstorageaccount;AccountKey=hNxD0hWMywsV2CrMiTAnkP7PeTtXI6v2aFuYrlI+LCUEEXxZFxoJDqK+CEKgcKrsgTfOLtUXGPgk+ASt/tOBIA==;EndpointSuffix=core.windows.net'
+#os.environ.get('AZURE_STORAGEFILE_CONNECTIONSTRING')
 # retrieve the connection string from the environment variable
 
 container_incomeexpenses = "incomeexpenses" # container name in which images will be store in the storage account
@@ -50,23 +51,23 @@ app.config['MAIL_SERVER'] = 'smtp.sendgrid.net'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'apikey'
-app.config['MAIL_PASSWORD'] = os.environ.get('SENDGRID_API_KEY')
+app.config['MAIL_PASSWORD'] = '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'
+''''os.environ.get('SENDGRID_API_KEY')'''
 app.config['MAIL_DEFAULT_SENDER'] = 'testingtestinguat2@gmail.com'
 os.environ.get('MAIL_DEFAULT_SENDER')
 mail = Mail(app)
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
-'''
 UPLOAD_FOLDER = '/Users/fionachong/Library/CloudStorage/OneDrive-個人/2324 Sem2/303COM/303 try/static/Project'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 UPLOAD_FOLDER_INVENTORY = '/Users/fionachong/Library/CloudStorage/OneDrive-個人/2324 Sem2/303COM/303 try/static/Inventory'
 app.config['UPLOAD_FOLDER_INVENTORY'] = UPLOAD_FOLDER_INVENTORY
 UPLOAD_FOLDER_IE = '/Users/fionachong/Library/CloudStorage/OneDrive-個人/2324 Sem2/303COM/303 try/static/IE'
 app.config['UPLOAD_FOLDER_IE'] = UPLOAD_FOLDER_IE
-'''
-bootstrap = Bootstrap(app)
 
+bootstrap = Bootstrap(app)
+'''
 try:
-   connection = pymysql.connect(user=os.environ.get('AZURE_MYSQL_USER'), password=os.environ.get('AZURE_MYSQL_PASSWORD'), host=os.environ.get('AZURE_MYSQL_HOST'), port=3306, database="FYP_FIONA", ssl_ca="DigiCertGlobalRootCA.crt.pem", ssl_disabled=False, local_infile = 1, cursorclass=pymysql.cursors.DictCursor)
+   connection = pymysql.connect(user='fiona0830', password='Cn92112103', host='mysqlserverforfyp.mysql.database.azure.com', port=3306, database="FYP_FIONA", ssl_ca="DigiCertGlobalRootCA.crt.pem", ssl_disabled=False, local_infile = 1, cursorclass=pymysql.cursors.DictCursor)
    print("Connection established")
 except mysql.connector.Error as err:
   if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -77,7 +78,6 @@ except mysql.connector.Error as err:
     print(err)
 else:
   cursor = connection.cursor()
-
 '''
 connection = pymysql.connect(host = 'localhost', 
     user = 'root',
@@ -85,7 +85,7 @@ connection = pymysql.connect(host = 'localhost',
     db = 'FYP_FIONA', 
     local_infile = 1,
     cursorclass=pymysql.cursors.DictCursor)
-'''
+
 
 def sendemail(email, subject, message):
     msg = Message(
@@ -225,7 +225,7 @@ def staffHome(id):
             user = getUserInfo(id)
             role = getRole(id)
             updateActivityStatus()
-            sql = 'SELECT * FROM tbl_Project, tbl_Customer, tbl_Activity, tbl_ActivityAssign WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND tbl_Project.ProjectID = tbl_Activity.ProjectID AND tbl_ActivityAssign.ActivityID = tbl_Activity.ActivityID AND UserID={UserID} AND ActivityEndDate<=curdate()'
+            sql = 'SELECT * FROM tbl_Project, tbl_Customer, tbl_Activity, tbl_ActivityAssign WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND tbl_Project.ProjectID = tbl_Activity.ProjectID AND tbl_ActivityAssign.ActivityID = tbl_Activity.ActivityID AND UserID={UserID} AND ActivityEndDate>=curdate() AND ActivityStatus <> "Deleted"'
             cursor.execute(sql.format(UserID=id))
             activity = cursor.fetchall()
             return render_template('home.html', user=user, activity=activity, role=role)
@@ -419,6 +419,7 @@ def viewProject(id, pid):
 def projectEnd(id, pid):
     if checkLoginStatus(id) == True:
         with connection.cursor() as cursor:
+            canClosed = True
             user = getUserInfo(id)
             role = getRole(id)
             sql = 'SELECT * FROM tbl_Project, tbl_Customer WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND ProjectID={pid}'
@@ -434,22 +435,28 @@ def projectEnd(id, pid):
                 TotalAmount = i['TotalAmount']
                 WarrantyEnd = i['WarrantyEnd']
                 EndDate = i['EndDate']
-            if ProjectStatus == 'Warranty Start':
-                if EndDate < date.today():
-                    if WarrantyEnd < date.today():
-                        if Invoiced == AmountReceived == TotalAmount:
-                            updateProjectSQL = 'UPDATE tbl_Project SET ProjectStatus="Project End" WHERE ProjectID={pid}'
-                            cursor.execute(updateProjectSQL.format(pid=pid))
-                            connection.commit()
-                            return redirect('/staff/{id}/project/{pid}/edit'.format(id=id, pid=pid))
-                        else:
-                            return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Invalid Amount', role=role)
+            for i in activity:
+                if i['ActivityStatus'] == "New" or i['ActivityStatus'] == "In Progress":
+                    canClosed = False
+            if canClosed == True: 
+                if ProjectStatus == 'Warranty Start':
+                    if EndDate < date.today():
+                        if WarrantyEnd < date.today():
+                            if Invoiced == AmountReceived == TotalAmount:
+                                updateProjectSQL = 'UPDATE tbl_Project SET ProjectStatus="Project End" WHERE ProjectID={pid}'
+                                cursor.execute(updateProjectSQL.format(pid=pid))
+                                connection.commit()
+                                return redirect('/staff/{id}/project/{pid}/edit'.format(id=id, pid=pid))
+                            else:
+                                return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Invalid Amount', role=role)
+                        else: 
+                            return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Warranty not yet end', role=role)
                     else: 
-                        return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Warranty not yet end', role=role)
-                else: 
-                    return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Project not yet end', role=role)
-            else:
-                return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Invalid Project Status', role=role)
+                        return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Project not yet end', role=role)
+                else:
+                    return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Invalid Project Status', role=role)
+            else: 
+                return render_template('staffProjectEdit.html', user=user, project=project,activity=activity, status='Invalid activity Status', role=role)
     else: 
         return render_template('404.html'), 404
 
@@ -1962,7 +1969,7 @@ def customerHome(id):
         with connection.cursor() as cursor:
             user = getCustomerInfo(id)
             updateActivityStatus()
-            sql = 'SELECT * FROM tbl_Project, tbl_Customer, tbl_Activity, tbl_ActivityAssign WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND tbl_Project.ProjectID = tbl_Activity.ProjectID AND tbl_ActivityAssign.ActivityID = tbl_Activity.ActivityID AND ActivityEndDate<=curdate() AND tbl_Customer.CustomerID={id}'
+            sql = 'SELECT * FROM tbl_Project, tbl_Customer, tbl_Activity, tbl_ActivityAssign WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND tbl_Project.ProjectID = tbl_Activity.ProjectID AND tbl_ActivityAssign.ActivityID = tbl_Activity.ActivityID AND ActivityEndDate>=curdate() AND tbl_Customer.CustomerID={id} AND ActivityStatus <> "Deleted"'
             cursor.execute(sql.format(id=id))
             activity = cursor.fetchall()
             sql = 'SELECT * FROM tbl_Project, tbl_Customer, tbl_Quotation WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND tbl_Project.ProjectID = tbl_Quotation.ProjectID AND tbl_Customer.CustomerID={id}'
@@ -2052,7 +2059,7 @@ def customerConfirmQuotation(id, qid):
                     TotalAmount = i['GrantTotal']
                 if ProjectStatus == 'Quotation Pending for Confirmation':
                     if QuotationStatus == 'Pending for Confirmation':
-                        updateQuotationSQL = 'UPDATE tbl_Quotation SET QuotationStatus="Confirmed", ConfirmedBy="Customer", ConfirmedWith="{ConfirmedWith}", ConfirmedTime="{ConfirmedTime}" WHERE QuotationID={QuotationID}'
+                        updateQuotationSQL = 'UPDATE tbl_Quotation SET QuotationStatus="Confirmed", ConfirmedWith="{ConfirmedWith}", ConfirmedTime="{ConfirmedTime}" WHERE QuotationID={QuotationID}'
                         cursor.execute(updateQuotationSQL.format(ConfirmedWith=ConfirmedWith, ConfirmedTime=ConfirmedTime, QuotationID=qid))
                         updateProjectSQL = 'UPDATE tbl_Project SET ProjectStatus="Project Start", TotalAmount={TotalAmount} WHERE ProjectID={ProjectID}'
                         cursor.execute(updateProjectSQL.format(ProjectID=ProjectID, TotalAmount=TotalAmount))
