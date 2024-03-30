@@ -12,7 +12,7 @@
                 <label for="ProjectID">Select Project</label>
                 <select name="ProjectID" id="ProjectID">
                   {% for data in project %}
-                    <option value="{{data.ProjectID}}">{{data.ProjectID}} - {{data.ProjectName}}
+                    <option value="{{data.ProjectID}}">{{data.ProjectID}} - {{data.ProjectName}} - {{data.ProjectStatus}}
                         Confirmed Quotation Amount: {{data.TotalAmount}} <br>
                         Invoiced Amount: {{data.Invoiced}} <br>
                     </option>

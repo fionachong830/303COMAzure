@@ -3,9 +3,9 @@
 {% block header %}Sign In As Customer{% endblock %}
 {% block content %}
 			<form class="login100-form validate-form" action="/customer/login" method="post">
-				<div class="wrap-input100 validate-input m-b-26" data-validate="User ID is required">
-					<span class="label-input100">User ID</span>
-					<input class="input100" type="text" name="userID" placeholder="Enter user ID" required>
+				<div class="wrap-input100 validate-input m-b-26" data-validate="Email is required">
+					<span class="label-input100">Email</span>
+					<input class="input100" type="text" name="Email" placeholder="Enter Email" required>
 					<span class="focus-input100"></span>
 				</div>
 
@@ -14,7 +14,6 @@
 					<input class="input100" type="password" name="password" placeholder="Enter password" required>
 					<span class="focus-input100"></span>
 				</div>
-
 				<div class="flex-sb-m w-full p-b-30">
 					<div>
 						<a href="/customer/forgotPassword" class="txt1">
@@ -22,7 +21,6 @@
 						</a>
 					</div>
 				</div>
-
 				<div class="container-login100-form-btn">
 					<button class="login100-form-btn">
 						Login
@@ -30,7 +28,7 @@
 				</div>
 			<br>
 			{% if status == 'fail' %}
-			Your userid or password is not correct.
+			Your email or password is not correct.
 			{% endif %}				
 			</form>	
 			<div class="container-login100-form-btn">

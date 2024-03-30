@@ -2,6 +2,12 @@
 {% block title %}Edit Quote{% endblock %}
 {% block header %}Edit Quote{% endblock %} 
 {% block content %}
+{% if status == 'Invalid Project Status' %}
+The project status is not equal to 'Project Start' or 'Warranty Start'. Cannot edit. 
+{% endif %} 
+{% if status == 'Invalid Quotation Status' %}
+The invoice status is not equal to 'New'. Cannot edit.
+{% endif %} 
 {% for info in user%}
 {% for data in quotation%}
 <h5>
@@ -83,9 +89,9 @@
                         <label for="WorkDescription">Work Description</label>
                         <input type="text" name="WorkDescription" required /> <br>
                         <label for="UnitRate">Unit Rate</label>
-                        <input type="number" name="UnitRate" step='0.01' required /> <br>
+                        <input type="number" name="UnitRate"  min="0.01" step='0.01' required /> <br>
                         <label for="Quantity">Quantity</label>
-                        <input type="number" name="Quantity" required /> <br>
+                        <input type="number" name="Quantity" min="1" required /> <br>
                         <label for="Quantifier">Quantifier</label>
                         <input type="text" name="Quantifier" required /> <br>
                         <input type="submit" value="Submit" /> <br>
@@ -111,9 +117,9 @@
                         <label for="WorkDescription">Work Description</label>
                         <input type="text" name="WorkDescription" required value="{{line.WorkDescription}}"/> <br>
                         <label for="UnitRate">Unit Rate</label>
-                        <input type="number" name="UnitRate" step='0.01' required value="{{line.UnitRate}}"/> <br>
+                        <input type="number" name="UnitRate" min="0.01" step='0.01' required value="{{line.UnitRate}}"/> <br>
                         <label for="Quantity">Quantity</label>
-                        <input type="number" name="Quantity" required value="{{line.Quantity}}"/> <br>
+                        <input type="number" name="Quantity" min="1" required value="{{line.Quantity}}"/> <br>
                         <label for="Quantifier">Quantifier</label>
                         <input type="text" name="Quantifier" required value="{{line.Quantifier}}"/> <br>
                         <input type="submit" value="Submit" /> <br>
@@ -128,9 +134,10 @@
 {% if status == 'Stock not enough' %}
 The stock is not enough. 
 {% endif %} 
-{% if status == 'Invalid Quotation Status' %}
-The activity status is not equal to 'New'. Cannot edit.
-{% endif %} 
+{% if status == 'success' %}
+Saved successfully. Thank you!
+{% endif %}
+
 <br><input type="button" value="Back" onclick="history.back()"> 
 </h5>
 {% endblock %}

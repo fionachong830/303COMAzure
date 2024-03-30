@@ -26,6 +26,9 @@
             </p>
         </div>
         <input type="submit" value="Submit" /> <br>
+        {% if status == 'success' %}
+        Saved successfully. Thank you! <br>
+        {% endif %}
         <input type="button" value="Back" onclick="history.back()">     
     </div>
     </form>

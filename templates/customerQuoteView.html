@@ -14,8 +14,11 @@
     <div class="buttons">
         <label for="reject" >Reject</label>
     </div><br> 
-    {% if status == 'Invalid Submit Status' %}
-    The project status is not "Pending for Quotation" or the quotation status is not "New".
+    {% if status == 'Invalid Confirm Project Status' %}
+    The project status is not "Quotation Pending for Confirmation".
+    {% endif %}  
+    {% if status == 'Invalid Confirm Quotation Status' %}
+    The quotation status is not "Pending for COnfirmation".
     {% endif %}  
     <div class="fill-in">
         <div class="background-box-yellow">

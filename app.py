@@ -12,6 +12,8 @@ from datetime import date
 from mysql.connector import errorcode
 from azure.storage.fileshare import ShareServiceClient, ShareFileClient
 from azure.storage.blob import BlobServiceClient
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 from pymysql.err import InterfaceError
 
 app = Flask(__name__)
@@ -84,6 +86,12 @@ connection = pymysql.connect(host = 'localhost',
     local_infile = 1,
     cursorclass=pymysql.cursors.DictCursor)
 '''
+conn = mysql.connector.connect (
+    user = os.environ.get('AZURE_MYSQL_USER'), 
+    password = os.environ.get('AZURE_MYSQL_PASSWORD'), 
+    host = os.environ.get('AZURE_MYSQL_HOST'),
+    db = 'FYP_FIONA', 
+    ssl_ca="DigiCertGlobalRootCA.crt.pem")
 
 def sendemail(email, subject, message):
     msg = Message(
@@ -92,6 +100,20 @@ def sendemail(email, subject, message):
         html=message
         )
     mail.send(msg)    
+
+def send_email(subject, sender, recipient, content):
+    message = Mail(
+       from_email=sender,
+       to_emails=recipient,
+       subject=subject,
+       html_content=content
+       )
+    try:
+       sg = SendGridAPIClient(app.config['SENDGRID_API_KEY'])
+       response = sg.send(message)
+       print('Email sent successfully')
+    except Exception as e:
+        print('Error sending email:', e)
 
 def checkLoginStatus(id): #new
     with connection.cursor() as cursor:    
@@ -161,6 +183,22 @@ def updateActivityStatus():
                 cursor.execute(updatesql.format(ActivityID=i["ActivityID"]))
                 connection.commit()
 
+@app.route('/send_email')
+def send_test_email():
+    messages = Mail(
+        from_email='testingtestinguat2@gmail.com',
+        to_emails='fionachong830@gmail.com',
+        subject='Sending with Twilio SendGrid is Fun',
+        html_content='<strong>and easy to do anywhere, even with Python</strong>')
+    try:
+        sg = SendGridAPIClient('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')
+        response = sg.send(messages)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+    except Exception as e:
+        print(e.message)
+
 @app.route("/") #new 
 def root():
     return render_template('LoginPage.html')
@@ -174,16 +212,17 @@ def staffLogin():
 def staffLoginValidation():
     with connection.cursor() as cursor:
         if request.method == 'POST':
-            userID = request.form['userID']
+            Email = request.form['Email']
             password = request.form['password']
-            sql = 'SELECT Password from tbl_UserManagement WHERE UserID="{userID}"'
-            cursor.execute(sql.format(userID=userID))
+            sql = 'SELECT UserID, Password from tbl_UserManagement WHERE Email="{Email}"'
+            cursor.execute(sql.format(Email=Email))
             result = cursor.fetchall()
             for i in result: 
                 if i['Password'] == password:
-                    id = userID
-                    sql = 'UPDATE tbl_UserManagement set loginStatus=1 where UserID={id};'
-                    cursor.execute(sql.format(id=id))
+                    Email = Email
+                    id = i["UserID"]
+                    sql = 'UPDATE tbl_UserManagement set loginStatus=1 where Email="{Email}";'
+                    cursor.execute(sql.format(Email=Email))
                     connection.commit()
                     return redirect('/staff/{id}/home'.format(id=id))
                 else: 
@@ -204,13 +243,16 @@ def staffPassword():
             Email = request.form['Email'].strip()
             cursor.execute('SELECT * from tbl_UserManagement')
             result = cursor.fetchall()
+            message = 0 
             for i in result: 
                 if int(i['PhoneNo']) == int(PhoneNo):   
                     if i['Email'] == Email:
                         subject = 'Forgot password'
-                        message = 'Your UserID: {UserID} <br> <br>' \
+                        sender = 'testingtestinguat2@gmail.com'
+                        recipient = Email
+                        content = 'Your UserID: {UserID} <br> <br>' \
                             'Your Password: {Password}<br> <br>'. format(UserID=i['UserID'] , Password=i['Password'] )
-                        sendemail(Email, subject, message)
+                        send_email(subject, sender, recipient, content)
                         return render_template('staffForgotPassword.html', status='sent')  
             return render_template('staffForgotPassword.html', status='fail')
         else: 
@@ -325,9 +367,9 @@ def addCustomer(id):
                     result = cursor.fetchall()
                     for i in result:
                         if int(i['PhoneNo']) == int(PhoneNo):
-                            return render_template('addCustomer.html', user=user, status='phoneNodup', role=role)
+                            return render_template('staffCustomerAdd.html', user=user, status='phoneNodup', role=role)
                         if i['Email'] == Email:
-                            return render_template('addCustomer.html', user=user, status='emaildup', role=role)   
+                            return render_template('staffCustomerAdd.html', user=user, status='emaildup', role=role)   
                     if SecondContact == '':
                         insertsql='INSERT INTO tbl_Customer(Password, CompanyName, ContactPerson, PhoneNo, Email, BillingAddress, PrimaryAddress, CompanyType, LoginStatus) VALUES ("{Password}", "{CompanyName}", "{ContactPerson}", "{PhoneNo}", "{Email}", "{BillingAddress}","{PrimaryAddress}", "{CompanyType}", 0)'
                         cursor.execute(insertsql.format(Password=Password, CompanyName=CompanyName, ContactPerson=ContactPerson, PhoneNo=PhoneNo, Email=Email, BillingAddress=BillingAddress, PrimaryAddress=PrimaryAddress, CompanyType=CompanyType))
@@ -785,9 +827,9 @@ def submitQuotation(id, qid):
                     connection.commit()
                     return redirect('/staff/{id}/quote/{qid}/view'.format(id=id, qid=qid))
                 else:
-                    return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role=role)
+                    return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Quotation Status', role=role)
             else:
-                return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role=role)
+                return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Project Status', role=role)
     else: 
         return render_template('404.html'), 404
 
@@ -820,9 +862,9 @@ def confirmQuotation(id, qid):
                         connection.commit()
                         return redirect('/staff/{id}/quote/{qid}/view'.format(id=id, qid=qid))
                     else:
-                        return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role=role)
+                        return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Confirm Quotation Status', role=role)
                 else:
-                    return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role=role)
+                    return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Confirm Project Status', role=role)
             else: 
                 return redirect('/staff/{id}/quote/{qid}/view'.format(id=id, qid=qid))
     else: 
@@ -856,9 +898,9 @@ def rejectQuotation(id, qid):
                         connection.commit()
                         return redirect('/staff/{id}/quote/{qid}/view'.format(id=id, qid=qid))
                     else:
-                        return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role=role)
+                        return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Confirm Quotation Status', role=role)
                 else:
-                    return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role=role)
+                    return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Confirm Project Status', role=role)
             else: 
                 return redirect('/staff/{id}/quote/{qid}/view'.format(id=id, qid=qid))
     else: 
@@ -1101,9 +1143,9 @@ def submitInvoice(id, iid):
                     else: 
                         return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid Amount', role=role)
                 else:
-                    return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid Submit Status', role=role)
+                    return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid Submit Invoice Status', role=role)
             else:
-                return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid Submit Status', role=role)
+                return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid Submit Project Status', role=role)
     else: 
         return render_template('404.html'), 404
 
@@ -1137,9 +1179,9 @@ def confirmInvoice(id, iid):
                     connection.commit()
                     return redirect('/staff/{id}/invoice/{iid}/view'.format(id=id, iid=iid))
                 else:
-                    return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid accept/reject Status', role=role)
+                    return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid accept/reject Invoice Status', role=role)
             else:
-                return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid accept/reject Status', role=role)
+                return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid accept/reject Project Status', role=role)
     else: 
         return render_template('404.html'), 404
 
@@ -1171,9 +1213,9 @@ def rejectInvoice(id, iid):
                     connection.commit()
                     return redirect('/staff/{id}/invoice/{iid}/view'.format(id=id, iid=iid))
                 else:
-                    return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid accept/reject Status', role=role)
+                    return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid accept/reject Invoice Status', role=role)
             else:
-                return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid accept/reject Status', role=role)
+                return render_template('staffInvoiceView.html', user=user, invoice=invoice, invoiceLine=invoiceLine, status='Invalid accept/reject Project Status', role=role)
     else: 
         return render_template('404.html'), 404
 
@@ -1473,7 +1515,7 @@ def viewInventory(id, iid):
             sql = 'SELECT * FROM tbl_UsageManagement WHERE InventoryID={iid}'
             cursor.execute(sql.format(iid=iid))
             usageLine = cursor.fetchall()
-            cursor.execute('SELECT * FROM tbl_Project WHERE ProjectStatus="Project Start" or ProjectStatus="Warranty Start"')
+            cursor.execute('SELECT * FROM tbl_Project WHERE ProjectStatus <> "Closed"')
             project = cursor.fetchall()
             return render_template('staffInventoryView.html', user=user, inventory=inventory, addStockLine=addStockLine, usageLine=usageLine, project=project, role=role)
     else: 
@@ -1558,6 +1600,8 @@ def usageManagement(id, iid):
         with connection.cursor() as cursor:
             user = getUserInfo(id)
             role = getRole(id) 
+            cursor.execute('SELECT * FROM tbl_Project WHERE ProjectStatus <> "Closed"')
+            project = cursor.fetchall()
             if request.method == 'POST':
                 InventoryID = request.form['InventoryID']
                 Date = request.form['Date']
@@ -1587,7 +1631,7 @@ def usageManagement(id, iid):
                     sql = 'SELECT * FROM tbl_UsageManagement WHERE InventoryID={iid}'
                     cursor.execute(sql.format(iid=iid))
                     usageLine = cursor.fetchall()
-                    return render_template('staffInventoryView.html', user=user, inventory=inventory, addStockLine=addStockLine, usageLine=usageLine, status="Stock not enough", role=role)
+                    return render_template('staffInventoryView.html', user=user, inventory=inventory, addStockLine=addStockLine, usageLine=usageLine, status="Stock not enough", role=role, project=project)
             else:
                 return redirect('/staff/{id}/inventory/{iid}/view'.format(id=id, iid=iid))
     else: 
@@ -1599,6 +1643,8 @@ def editUsageManagement(id, iid, uid):
         with connection.cursor() as cursor:
             user = getUserInfo(id)
             role = getRole(id)
+            cursor.execute('SELECT * FROM tbl_Project WHERE ProjectStatus <> "Closed"')
+            project = cursor.fetchall()
             if request.method == 'POST':
                 InventoryID = request.form['InventoryID']
                 Date = request.form['Date']
@@ -1629,7 +1675,7 @@ def editUsageManagement(id, iid, uid):
                     sql = 'SELECT * FROM tbl_UsageManagement WHERE InventoryID={iid}'
                     cursor.execute(sql.format(iid=iid))
                     usageLine = cursor.fetchall()
-                    return render_template('staffInventoryView.html', user=user, inventory=inventory, addStockLine=addStockLine, usageLine=usageLine, status="Stock not enough", role=role)
+                    return render_template('staffInventoryView.html', user=user, inventory=inventory, addStockLine=addStockLine, usageLine=usageLine, status="Stock not enough", role=role, project=project)
             else:
                 return redirect('/staff/{id}/inventory/{iid}/view'.format(id=id, iid=iid))
     else: 
@@ -1748,6 +1794,15 @@ def IEDownload(id, ieid):
 def editIE(id, ieid):
     if checkLoginStatus(id) == True:
         with connection.cursor() as cursor:
+
+            if request.method == 'POST':
+                Details = request.form['Details']
+                Date = request.form['Date']
+                Category = request.form['Category']
+                Amount = request.form['Amount']
+                insertsql='UPDATE tbl_IncomeExpenses SET Details="{Details}", Date="{Date}", Category="{Category}", Amount={Amount} WHERE IEID={ieid}'
+                cursor.execute(insertsql.format(Details=Details, Date=Date, Category=Category, Amount=Amount, ieid=ieid))
+                connection.commit()
             user = getUserInfo(id)
             role = getRole(id)
             sql = 'SELECT * FROM tbl_IncomeExpenses WHERE IEID={ieid}'
@@ -1757,14 +1812,6 @@ def editIE(id, ieid):
             allUser = cursor.fetchall()  
             cursor.execute('SELECT * FROM tbl_Project WHERE ProjectStatus <> "Closed"')
             project = cursor.fetchall()
-            if request.method == 'POST':
-                Details = request.form['Details']
-                Date = request.form['Date']
-                Category = request.form['Category']
-                Amount = request.form['Amount']
-                insertsql='UPDATE tbl_IncomeExpenses SET Details="{Details}", Date="{Date}", Category="{Category}", Amount={Amount} WHERE IEID={ieid}'
-                cursor.execute(insertsql.format(Details=Details, Date=Date, Category=Category, Amount=Amount, ieid=ieid))
-                connection.commit()
             return render_template('staffIEEdit.html', user=user, record=record, allUser=allUser, project=project, role=role)
     else: 
         return render_template('404.html'), 404
@@ -1815,18 +1862,13 @@ def IEexport(id):
 @app.route("/staff/<int:id>/IncomeExpenses/export/download", methods=['POST', 'GET']) #new
 def IEexportDownload(id):
     if checkLoginStatus(id) == True:
-        conn = mysql.connector.connect(
-        host="mysqlserverforfyp.mysql.database.azure.com", 
-        user="fiona0830", 
-        password="Cn92112103", 
-        db = 'FYP_FIONA', 
-        ssl_ca="DigiCertGlobalRootCA.crt.pem")
         if request.method == 'POST':
             Type = request.form['Type']
             fromDate = request.form['fromDate']
             toDate = request.form['toDate']
             sql = "SELECT * FROM tbl_IncomeExpenses WHERE Type='{Type}' AND Date BETWEEN '{fromDate}' AND '{toDate}'" 
             query = sql.format(Type=Type, fromDate=fromDate, toDate=toDate)
+            print(query)
             df = pd.read_sql_query(query, conn)  # Read data into a pandas DataFrame
             conn.close()
             excel_file_path = "output_data.xlsx" # Export the data from the DataFrame to an Excel file
@@ -1855,9 +1897,9 @@ def profileCreation(id):
                     result = cursor.fetchall()
                     for i in result:
                         if int(i['PhoneNo']) == int(phoneNo):
-                            return render_template('staffProfileCreation.html', user=user, status='phoneNodup')
+                            return render_template('staffProfileCreation.html', user=user, status='phoneNodup',  role=role)
                         if i['Email'] == email:
-                            return render_template('staffProfileCreation.html', user=user, status='emaildup')   
+                            return render_template('staffProfileCreation.html', user=user, status='emaildup', role=role)   
                     insertsql='INSERT INTO tbl_UserManagement(Password, Name, Email, PhoneNo, Role, LoginStatus) VALUES ("{password}", "{name}", "{email}", "{phoneNo}", "{role}", 0)'
                     cursor.execute(insertsql.format(password=password, name=name, phoneNo=phoneNo, email=email, role=accType))
                     connection.commit()
@@ -1918,14 +1960,14 @@ def customerLogin():
 def customerLoginValidation():
     with connection.cursor() as cursor:
         if request.method == 'POST':
-            CustomerID = request.form['userID']
+            Email = request.form['Email']
             password = request.form['password']
-            sql = 'SELECT Password from tbl_Customer WHERE CustomerID={CustomerID}'
-            cursor.execute(sql.format(CustomerID=CustomerID))
+            sql = 'SELECT CustomerID, Password from tbl_Customer WHERE Email="{Email}"'
+            cursor.execute(sql.format(Email=Email))
             result = cursor.fetchall()
             for i in result: 
                 if i['Password'] == password:
-                    id = CustomerID
+                    id = i['CustomerID']
                     sql = 'UPDATE tbl_Customer set loginStatus=1 where CustomerID={id};'
                     cursor.execute(sql.format(id=id))
                     connection.commit()
@@ -2064,9 +2106,9 @@ def customerConfirmQuotation(id, qid):
                         connection.commit()
                         return redirect('/customer/{id}/quote/{qid}/view'.format(id=id, qid=qid))
                     else:
-                        return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role='Customer')
+                        return render_template('customerQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, role="Customer", status = 'Invalid Confirm Quotation Status')
                 else:
-                        return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role='Customer')
+                    return render_template('customerQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, role="Customer", status = 'Invalid Confirm Project Status')
             else: 
                 return redirect('/customer/{id}/quote/{qid}/view'.format(id=id, qid=qid))
     else: 
@@ -2092,16 +2134,16 @@ def customerRejectQuotation(id, qid):
                     QuotationStatus = i['QuotationStatus']
                 if ProjectStatus == 'Quotation Pending for Confirmation':
                     if QuotationStatus == 'Pending for Confirmation':
-                        updateQuotationSQL = 'UPDATE tbl_Quotation SET QuotationStatus="Rejected", ConfirmedBy="Customer", ConfirmedWith="{ConfirmedWith}", ConfirmedTime="{ConfirmedTime}" WHERE QuotationID={QuotationID}'
+                        updateQuotationSQL = 'UPDATE tbl_Quotation SET QuotationStatus="Rejected", ConfirmedWith="{ConfirmedWith}", ConfirmedTime="{ConfirmedTime}" WHERE QuotationID={QuotationID}'
                         cursor.execute(updateQuotationSQL.format(ConfirmedWith=ConfirmedWith, ConfirmedTime=ConfirmedTime, QuotationID=qid))
                         updateProjectSQL = 'UPDATE tbl_Project SET ProjectStatus="Pending for Quotation" WHERE ProjectID={ProjectID}'
                         cursor.execute(updateProjectSQL.format(ProjectID=ProjectID))
                         connection.commit()
                         return redirect('/customer/{id}/quote/{qid}/view'.format(id=id, qid=qid))
                     else:
-                        return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role='Customer')
+                        return render_template('customerQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, role="Customer", status = 'Invalid Confirm Quotation Status')
                 else:
-                        return render_template('staffQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, status='Invalid Submit Status', role='Customer')
+                    return render_template('customerQuoteView.html', user=user, quotation=quotation, quotationLine=quotationLine, role="Customer", status = 'Invalid Confirm Project Status')
             else: 
                 return redirect('/customer/{id}/quote/{qid}/view'.format(id=id, qid=qid))
     else: 

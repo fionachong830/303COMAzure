@@ -102,10 +102,10 @@
                 </table>
             </p>
         </div>
+        {% if status == 'Stock not enough' %}
+        Stock not enough.
+        {% endif %}	
         <input type="button" value="Back" onclick="history.back()">     
-        {% if status == 'Invalid Project Status' %}
-    The project status is not equal to 'Pending for Quotation' or 'Quotation Pending for Confirmation'. Cannot edit. 
-    {% endif %} 
     </div>
 
     <input class="modal-state_cus" id="Add" type="checkbox" />
@@ -121,9 +121,9 @@
                         <label for="Date">Date</label>
                         <input type="date" name="Date" required /> <br>
                         <label for="Quantity">Quantity</label>
-                        <input type="number" name="Quantity" required /> <br>
+                        <input type="number" name="Quantity" min = '0' required /> <br>
                         <label for="UnitPrice">Unit Price</label>
-                        <input type="number" name="UnitPrice" step='0.01' required /> <br>
+                        <input type="number" name="UnitPrice" min = '0' step='0.01' required /> <br>
                         <label for="Remarks">Remarks</label>
                         <input type="text" name="Remarks" required /> <br>
                         <input type="submit" value="Submit" /> <br>
@@ -150,9 +150,9 @@
                         <label for="Date">Date</label>
                         <input type="date" name="Date" required value={{line.Date}} /> <br>
                         <label for="Quantity">Quantity</label>
-                        <input type="number" name="Quantity" required value={{line.Quantity}} /> <br>
+                        <input type="number" name="Quantity" min = '0' required value={{line.Quantity}} /> <br>
                         <label for="UnitPrice">Unit Price</label>
-                        <input type="number" name="UnitPrice" step='0.01' required value={{line.UnitPrice}} /> <br>
+                        <input type="number" name="UnitPrice" min = '0' step='0.01' required value={{line.UnitPrice}} /> <br>
                         <label for="Remarks">Remarks</label>
                         <input type="text" name="Remarks" required value={{line.Remarks}} /> <br>
                         <input type="submit" value="Submit" /> <br>
@@ -176,13 +176,13 @@
                         <label for="Date">Date</label>
                         <input type="date" name="Date" required /> <br>
                         <label for="Quantity">Quantity</label>
-                        <input type="number" name="Quantity" required /> <br>
+                        <input type="number" name="Quantity" min = '0' required /> <br>
                         <label for="Remarks">Remarks</label>
                         <input type="text" name="Remarks" required /> <br>
                         <label for="ProjectID">Select Project</label>
                         <select name="ProjectID" id="ProjectID">
                             {% for id in project %}
-                            <option value="{{id.ProjectID}}">{{id.ProjectID}} - {{id.ProjectName}}</option>
+                            <option value="{{id.ProjectID}}">{{id.ProjectID}} - {{id.ProjectName}} - {{id.ProjectStatus}}</option>
                             {% endfor %}
                         </select><br>
                         <input type="submit" value="Submit" /> <br>
@@ -209,13 +209,13 @@
                         <label for="Date">Date</label>
                         <input type="date" name="Date" required value={{line.Date}} /> <br>
                         <label for="Quantity">Quantity</label>
-                        <input type="number" name="Quantity" required value={{line.Quantity}} /> <br>
+                        <input type="number" name="Quantity" min = '0' required value={{line.Quantity}} /> <br>
                         <label for="Remarks">Remarks</label>
                         <input type="text" name="Remarks" required value={{line.Remarks}} /> <br>
                         <label for="ProjectID">Select Project</label>
                         <select name="ProjectID" id="ProjectID" value="{{line.ProjectID}}">
                             {% for id in project %}
-                            <option value="{{id.ProjectID}}">{{id.ProjectID}} - {{id.ProjectName}}</option>
+                            <option value="{{id.ProjectID}}">{{id.ProjectID}} - {{id.ProjectName}} - {{id.ProjectStatus}}</option>
                         {% endfor %}
                         </select><br>
                         <input type="submit" value="Submit" /> <br>
@@ -227,5 +227,5 @@
     {% endfor %}
 </h5>
 {% endfor %}
-{% endfor %}
+{% endfor %}			
 {% endblock %}

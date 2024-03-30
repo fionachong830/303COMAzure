@@ -23,7 +23,7 @@
                     <label for="Category">Category</label>
                     <input type="text" name="Category" required value="{{record.Category}}"/> <br>
                     <label for="Amount">Amount</label>
-                    <input type="number" name="Amount" step='0.01' required value="{{record.Amount}}"/> <br>
+                    <input type="number" name="Amount" min='0.01' step='0.01' required value="{{record.Amount}}"/> <br>
                     <label for="Attachment">Attachment</label>
                     {{record.Attachment}} 
                     <div class="buttons">

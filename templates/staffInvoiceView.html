@@ -17,11 +17,17 @@
     <div class="buttons">
         <button type="button" onclick="window.location.href='/staff/{{info.UserID}}/invoice/{{data.InvoiceID}}/view/reject'">Rejected</button>
     </div>
-    {% if status == 'Invalid Submit Status' %}
-    The project status is not "Project Start" or "Warranty Start" / The invoice status is not "New".
+    {% if status == 'Invalid Submit Project Status' %}
+    The project status is not "Project Start" or "Warranty Start".
     {% endif %}  
-    {% if status == 'Invalid accept/reject Status' %}
+    {% if status == 'Invalid Submit Invoice Status' %}
+    The invoice status is not "New".
+    {% endif %}  
+    {% if status == 'Invalid accept/reject Project Status' %}
     The project status is not "Project Start" or "Warranty Start"/ The invoice status is not "Pending for Payment".
+    {% endif %}  
+    {% if status == 'Invalid accept/reject Invoice Status' %}
+    The invoice status is not "Pending for Payment".
     {% endif %}  
     {% if status == 'Invalid Amount' %}
     The total amount in quotation is smaller than the invoiced amount + the grant total amount in this invoice.

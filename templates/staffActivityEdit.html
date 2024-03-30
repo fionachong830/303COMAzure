@@ -123,6 +123,9 @@ The project status is not equal to 'Project Start' or 'Warranty Start'. Cannot e
 {% if status == 'Invalid Activity Status' %}
 The activity status is not equal to 'New' or 'In Progress'. Cannot edit.
 {% endif %} 
+{% if status == 'success' %}
+Saved successfully. Thank you!
+{% endif %}
 <br><input type="button" value="Back" onclick="history.back()"> 
 </h5>
 {% endblock %}

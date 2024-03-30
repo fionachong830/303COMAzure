@@ -70,8 +70,7 @@
                 </table>
             </p>
         </div>
-        <input type="submit" value="Submit" /> <br>
-        <input type="button" value="Back" onclick="history.back()">         
+        <input type="submit" value="Submit" /> <br>     
     </div>
     </form>
 
@@ -137,6 +136,9 @@ The project status is not equal to 'Project Start' or 'Warranty Start'. Cannot e
 {% if status == 'Invalid Invoice Status' %}
 The invoice status is not equal to 'New'. Cannot edit.
 {% endif %} 
-<br><input type="button" value="Back" onclick="history.back()"> 
+{% if status == 'success' %}
+Saved successfully. Thank you!
+{% endif %}
+<br><input type="button" value="Back" onclick="history.back()">    
 </h5>
 {% endblock %}
