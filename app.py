@@ -16,7 +16,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from pymysql.err import InterfaceError
 
-app = Flask(__name__)
+app = Flask(__name__) 
 
 connect_str = os.environ.get('AZURE_STORAGEFILE_CONNECTIONSTRING')
 # retrieve the connection string from the environment variable
