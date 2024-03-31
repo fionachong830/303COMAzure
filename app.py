@@ -3,7 +3,7 @@ import pdfkit
 from flask_bootstrap import Bootstrap
 import pymysql
 import os
-from flask_mail import Mail, Message
+from flask_mail import Mail, Message 
 import pandas as pd
 import mysql.connector 
 from distutils.log import debug
