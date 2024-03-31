@@ -2143,12 +2143,14 @@ def customerViewQuoteReport(id, qid):
             sql = 'SELECT * FROM tbl_QuotationLine WHERE QuotationID="{QuotationID}"'
             cursor.execute(sql.format(QuotationID=qid))
             quotationLine = cursor.fetchall()
+            '''
             rendered = render_template('staffQuoteReport.html', quotation=quotation, quotationLine=quotationLine)
             responsestring = pdfkit.from_string(rendered, False, options={"enable-local-file-access": ""})
             response = make_response(responsestring)
             response.headers['Content-Type'] = 'application/pdf'
-            response.headers['Content-Disposition'] = 'attachment;filename=quotation.pdf'      
-            return response
+            response.headers['Content-Disposition'] = 'attachment;filename=quotation.pdf'   
+            '''   
+            return render_template('staffQuoteReport.html', quotation=quotation, quotationLine=quotationLine)
     else: 
         return render_template('404.html'), 404
 
