@@ -12,8 +12,6 @@ from datetime import date
 from mysql.connector import errorcode
 from azure.storage.fileshare import ShareServiceClient, ShareFileClient
 from azure.storage.blob import BlobServiceClient
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 from pymysql.err import InterfaceError
 
 app = Flask(__name__) 
@@ -100,21 +98,7 @@ def sendemail(email, subject, message):
         html=message
         )
     mail.send(msg)    
-
-def send_email(subject, sender, recipient, content):
-    message = Mail(
-       from_email=sender,
-       to_emails=recipient,
-       subject=subject,
-       html_content=content
-       )
-    try:
-       sg = SendGridAPIClient(app.config['SENDGRID_API_KEY'])
-       response = sg.send(message)
-       print('Email sent successfully')
-    except Exception as e:
-        print('Error sending email:', e)
-
+    
 def checkLoginStatus(id): #new
     with connection.cursor() as cursor:    
         sql = 'SELECT LoginStatus from tbl_UserManagement WHERE UserID={id}'
