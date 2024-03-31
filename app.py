@@ -131,7 +131,7 @@ def checkCustomerLoginStatus(id): #new
         sql = 'SELECT LoginStatus from tbl_Customer WHERE CustomerID={id}'
         cursor.execute(sql.format(id=id))
         data = cursor.fetchall()
-        for e in data:
+        for e in data: 
             if e['LoginStatus']== 1:
                 return True
             else: 
