@@ -1998,7 +1998,7 @@ def customerHome(id):
         with connection.cursor() as cursor:
             user = getCustomerInfo(id)
             updateActivityStatus()
-            sql = 'SELECT * FROM tbl_Project, tbl_Customer, tbl_Activity, tbl_ActivityAssign WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND tbl_Project.ProjectID = tbl_Activity.ProjectID AND tbl_ActivityAssign.ActivityID = tbl_Activity.ActivityID AND ActivityEndDate>=curdate() AND tbl_Customer.CustomerID={id} AND ActivityStatus <> "Deleted"'
+            sql = 'SELECT * FROM tbl_Project, tbl_Customer, tbl_Activity WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND tbl_Project.ProjectID = tbl_Activity.ProjectID AND ActivityEndDate>=curdate() AND tbl_Customer.CustomerID={id} AND ActivityStatus <> "Deleted"'
             cursor.execute(sql.format(id=id))
             activity = cursor.fetchall()
             sql = 'SELECT * FROM tbl_Project, tbl_Customer, tbl_Quotation WHERE tbl_Project.CustomerID=tbl_Customer.CustomerID AND tbl_Project.ProjectID = tbl_Quotation.ProjectID AND tbl_Customer.CustomerID={id}'
